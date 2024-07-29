@@ -338,7 +338,7 @@ def load_config(cfg_filepath):
         cfg_filepath (str): The file path to the YAML configuration file.
 
     Returns:
-        teeth3d.utils.ConfigDict: A ConfigDict object containing the
+        resize_dataset.utils.ConfigDict: A ConfigDict object containing the
             parsed YAML configuration.
     """
     with open(cfg_filepath, encoding="utf-8") as f:
