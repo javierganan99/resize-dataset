@@ -1,0 +1,13 @@
+dataset_format: "coco"
+dataset_task: "panoptic"
+task: scale
+scale_factor: 4
+image_shape: null # or [H,W]
+resize_image_method: "bicubic"
+resize_mask_method: "nearest"
+show: False
+save: False
+images_path: "/home/fjganan/GitHub/datasets/coco_dataset/val2017"
+labels_path: "/home/fjganan/GitHub/datasets/coco_dataset/panoptic_val2017.json"
+images_output_path: "/home/fjganan/GitHub/resize-dataset/results/coco_dataset/images/"
+labels_output_path: "/home/fjganan/GitHub/resize-dataset/results/coco_dataset/panoptic_val2017.json"

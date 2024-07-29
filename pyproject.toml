@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "resize-dataset"
+version = "0.1.0"
+description = ""
+authors = ["fjganan14 <fjganan14@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+opencv-python = "^4.10.0.84"
+torch = "^2.3.1"
+pycocotools = "^2.0.8"
+pyyaml = "^6.0.1"
+tqdm = "^4.66.4"
+
+[tool.poetry.scripts]
+resize-dataset = "resize_dataset.cfg:entrypoint"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
