@@ -1,10 +1,27 @@
-name: Lint
+name: PR Content Check
 
-on: [push, pull_request]
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
 
 jobs:
-  lint:
+  check-pr-content:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v3
-      - uses: psf/black@stable
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Check PR description for mandatory content
+      run: |
+        PR_BODY=$(jq -r .pull_request.body < $GITHUB_EVENT_PATH)
+        MANDATORY_SECTIONS=("Summary" "Issue Number" "Description")
+        
+        for SECTION in "${MANDATORY_SECTIONS[@]}"; do
+          if [[ "$PR_BODY" != *"$SECTION"* ]]; then
+            echo "The PR description must contain a '$SECTION' section." >&2
+            exit 1
+          fi
+        done
+
+        echo "PR description contains all mandatory sections."
