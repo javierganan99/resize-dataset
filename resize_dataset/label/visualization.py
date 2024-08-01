@@ -172,6 +172,42 @@ def add_mask(
     return image
 
 
+def add_keypoints(
+    image,
+    keypoints,
+    label=None,
+    keypoint_color=(0, 255, 0),
+    skeleton_color=(255, 0, 0),
+    keypoint_radius=5,
+    skeleton_thickness=2,
+):
+    keypoints = np.array(keypoints).reshape(-1, 3)
+
+    for x, y, v in keypoints:
+        if v > 0:
+            cv2.circle(image, (int(x), int(y)), keypoint_radius, keypoint_color, -1)
+
+    if label and "skeleton" in label:
+        skeleton = label["skeleton"]
+        num_keypoints = keypoints.shape[0]
+        for joint in skeleton:
+            if joint[0] < num_keypoints and joint[1] < num_keypoints:
+                x1, y1, v1 = keypoints[joint[0]]
+                x2, y2, v2 = keypoints[joint[1]]
+                if v1 > 0 and v2 > 0:
+                    cv2.line(
+                        image,
+                        (int(x1), int(y1)),
+                        (int(x2), int(y2)),
+                        skeleton_color,
+                        skeleton_thickness,
+                    )
+    return image
+
+
 VISUALIZATION_REGISTRY = ConfigDict(
-    bbox=add_bounding_box, mask=add_mask, polygons=add_polygons
+    bbox=add_bounding_box,
+    mask=add_mask,
+    polygons=add_polygons,
+    keypoints=add_keypoints,
 )

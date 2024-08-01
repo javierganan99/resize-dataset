@@ -4,6 +4,7 @@ from pathlib import Path
 import cv2
 import torch
 import numpy as np
+import os
 import pycocotools.mask as mask_utils
 from pycocotools import _mask as coco_mask
 from resize_dataset.image import RESIZE_METHODS
@@ -12,7 +13,13 @@ from resize_dataset.label import (
     rle_to_mask,
     mask_to_rle,
 )
-from resize_dataset.utils import ConfigDict, load_json, save_json
+from resize_dataset.utils import (
+    ConfigDict,
+    load_json,
+    save_json,
+    ensure_folder_exist,
+    LOGGER,
+)
 from .utils import generate_n_unique_colors
 from .base import ResizableDataset
 
@@ -617,3 +624,639 @@ class COCODatasetPanoptic(ResizableDataset):
             self.output_annotations,
             self.labels_output_path,
         )
+
+
+@COCO_TASKS.register(name="densepose")
+class COCODatasetDensePose(ResizableDataset):
+    """
+    Dataset class for loading and processing images and DensePose annotations in COCO format.
+
+    This class provides functionality to initialize a dataset from a specified images path
+    and annotations path, retrieve images and DensePose annotations, scale images and annotations
+    based on a given factor, and visualize the DensePose annotations on images.
+
+    Args:
+        images_path (str): Path to the folder containing images.
+        annotations_path (str): Path to the COCO annotations JSON file.
+        cfg (ConfigDict): Configuration object containing scaling and resizing parameters.
+
+    Attributes:
+        cfg (ConfigDict): Configuration object containing scaling and resizing parameters.
+        images_folder (str): Path to the folder containing images.
+        annotations (ConfigDict): DensePose-specific annotations.
+        ids (list): Sorted list of image IDs in the annotations.
+        id2name (dict): Mapping from category ID to category name.
+        name2id (dict): Mapping from category name to category ID.
+        id2color (dict): Mapping from category ID to a unique color.
+
+    Methods:
+        scale(img, anns, scale_factor, resize_image_method="bicubic"): Scales the DensePose annotations
+            by the given scale factor.
+        show(image, anns): Displays the image with its corresponding DensePose annotations.
+        __getitem__(index): Retrieves the image and DensePose annotations for the given index.
+        __len__(): Returns the total number of images in the dataset.
+
+    Private Methods:
+        _create_annotations(annotations_path): Initializes the DensePose annotations from the COCO format
+            JSON file and sets up internal mappings.
+        save(index, image, anns): Saves an image and its DensePose annotations to the output folder
+            and dictionary.
+    """
+
+    def __init__(self, images_path, annotations_path, cfg):
+        self.cfg = cfg
+        self.images_folder = images_path
+        self._create_annotations(annotations_path)
+        self.ids = list(sorted(self.annotations["imgs"].keys()))
+        self.id2name = {k: v["name"] for k, v in self.annotations["cats"].items()}
+        self.name2id = {v: k for k, v in self.id2name.items()}
+        self.id2color = generate_n_unique_colors(self.id2name.keys())
+        # To save
+        self.images_output_folder = self.cfg.images_output_path
+        self.labels_output_path = self.cfg.labels_output_path
+        self.output_annotations = {"images": [], "annotations": []}
+
+    def _create_annotations(self, annotations_path):
+        """
+        Creates and organizes DensePose annotations from a specified JSON file.
+
+        This function loads DensePose annotations from a given path and structures them into
+        a dictionary-like object. It organizes the annotations by mapping image IDs to their
+        corresponding DensePose data.
+        """
+        self.annotations = ConfigDict()
+        self.annotations["dataset"] = load_json(annotations_path)
+        self.annotations["anns"] = {}
+        self.annotations["cats"] = {}
+        self.annotations["imgs"] = {}
+        self.annotations["imgToAnns"] = ConfigDict()
+        self.annotations["catToImgs"] = ConfigDict()
+
+        if "annotations" in self.annotations["dataset"]:
+            for ann in self.annotations["dataset"]["annotations"]:
+                if "densepose" in ann:
+                    if ann["image_id"] not in self.annotations["imgToAnns"]:
+                        self.annotations["imgToAnns"][ann["image_id"]] = []
+                    self.annotations["imgToAnns"][ann["image_id"]].append(ann)
+                    self.annotations["anns"][ann["id"]] = ann
+
+        if "images" in self.annotations["dataset"]:
+            for img in self.annotations["dataset"]["images"]:
+                self.annotations["imgs"][img["id"]] = img
+
+        if "categories" in self.annotations["dataset"]:
+            for cat in self.annotations["dataset"]["categories"]:
+                self.annotations["cats"][cat["id"]] = cat
+
+    def scale(self, img, anns, scale_factor, resize_image_method="bicubic"):
+        """
+        Scales DensePose annotations by a specified factor.
+
+        This function scales the DensePose coordinates accordingly. The image scaling is
+        handled by the base class, but DensePose-specific scaling is done here.
+        """
+        img = RESIZE_METHODS.get(resize_image_method)(img, scale_factor)
+        for ann in anns:
+            if "densepose" in ann:
+                # Scale DensePose coordinates (u, v)
+                ann["densepose"]["u"] = [
+                    c * scale_factor for c in ann["densepose"]["u"]
+                ]
+                ann["densepose"]["v"] = [
+                    c * scale_factor for c in ann["densepose"]["v"]
+                ]
+        return img, anns
+
+    def show(self, image, anns):
+        """
+        Displays an image with DensePose annotations such as DensePose coordinates.
+
+        This function takes an image represented as a NumPy array and a list of annotation
+        dictionaries, visualizing the DensePose annotations on the image.
+        """
+        img_with_annotations = image.copy()
+        # TODO: Include in Visualization registry
+        for ann in anns:
+            if "densepose" in ann:
+                u_coords = np.array(ann["densepose"]["u"]).astype(int)
+                v_coords = np.array(ann["densepose"]["v"]).astype(int)
+                for u, v in zip(u_coords, v_coords):
+                    cv2.circle(
+                        img_with_annotations, (u, v), 2, (0, 255, 0), -1
+                    )  # Green dots
+
+        cv2.namedWindow("Annotations", cv2.WINDOW_NORMAL)
+        cv2.imshow("Annotations", img_with_annotations)
+        cv2.waitKey(0)
+
+    def __getitem__(self, index):
+        """
+        Retrieves an image and its associated DensePose annotations from the dataset based on the given index.
+
+        This function accesses the dataset using the specified index to return the processed image
+        and its corresponding DensePose annotations.
+        """
+        img_id = self.ids[index]
+        ann_ids = (
+            [ann["id"] for ann in self.annotations["imgToAnns"].get(img_id, [])]
+            if img_id in self.annotations["imgToAnns"]
+            else []
+        )
+        anns = [self.annotations["anns"].get(idx, {}) for idx in ann_ids]
+        path = self.annotations["imgs"][img_id]["file_name"]
+        img = cv2.imread(str(Path(self.images_folder) / path))
+        img, anns = self.scale(
+            img,
+            anns,
+            scale_factor=self.cfg.scale_factor,
+            resize_image_method=self.cfg.resize_image_method,
+        )
+        if self.cfg.save:
+            self.save(index, img, anns)
+        return img, [anns]
+
+    def __len__(self):
+        """
+        Returns the number of images in the dataset.
+        """
+        return len(self.ids)
+
+    def save(self, index, image, anns):
+        """
+        Saves an image and its DensePose annotations to the output folder and dictionary.
+
+        This function writes the image to the images output folder and appends
+        the DensePose annotations to the output_annotations dictionary.
+        """
+        img_id = self.ids[index]
+        image_name = self.annotations["imgs"][img_id]["file_name"]
+        cv2.imwrite(str(Path(self.images_output_folder) / image_name), image)
+        for ann in anns:
+            if "densepose" in ann:
+                self.output_annotations["annotations"].append(ann)
+        self.output_annotations["images"].append(self.annotations["imgs"][img_id])
+
+    def close(self):
+        """
+        Saves all DensePose annotations to a JSON file specified in the labels_output_path.
+        """
+        save_json(self.output_annotations, self.labels_output_path)
+
+
+@COCO_TASKS.register(name="captioning")
+class COCODatasetCaption(ResizableDataset):
+    """
+    Dataset class for loading and processing images and captions in COCO format.
+
+    This class provides functionality to initialize a dataset from a specified images path
+    and annotations path, retrieve images and captions, scale images based on a given factor,
+    and visualize the images with captions. It is designed for image captioning tasks.
+
+    Args:
+        images_path (str): Path to the folder containing images.
+        annotations_path (str): Path to the COCO annotations JSON file.
+        cfg (ConfigDict): Configuration object containing scaling and resizing parameters.
+
+    Attributes:
+        cfg (ConfigDict): Configuration object containing scaling and resizing parameters.
+        images_folder (str): Path to the folder containing images.
+        annotations (COCO): COCO object representing the annotations.
+        ids (list): Sorted list of image IDs in the annotations.
+        captions (dict): Mapping from image ID to a list of captions.
+
+    Methods:
+        scale(img, scale_factor, resize_image_method="bicubic"): Scales the image by the given scale factor.
+        show(image, caption): Displays the image with its corresponding caption.
+        __getitem__(index): Retrieves the image and caption for the given index.
+        __len__(): Returns the total number of images in the dataset.
+
+    Private Methods:
+        _create_annotations(annotations_path): Initializes the annotations from the COCO format JSON file.
+    """
+
+    def __init__(self, images_path, annotations_path, cfg):
+        self.cfg = cfg
+        self.images_folder = images_path
+        self._create_annotations(annotations_path)
+        self.ids = list(sorted(self.annotations.imgs.keys()))
+        self.images_output_folder = self.cfg.images_output_path
+        self.labels_output_path = self.cfg.labels_output_path
+        self.output_annotations = self.annotations.dataset
+        self.captions = {img_id: [] for img_id in self.ids}
+
+    def _create_annotations(self, annotations_path):
+        """
+        Creates and organizes annotations from a specified JSON file.
+
+        This function loads annotations from a given path and structures them into
+        a dictionary-like object. It organizes the annotations by mapping image IDs
+        to their corresponding captions.
+
+        Args:
+            annotations_path (str): The file path to the JSON annotations file.
+
+        Returns:
+            None: This function does not return a value. It modifies the
+            annotations attribute of the class instance in place.
+        """
+        self.annotations = ConfigDict()
+        self.annotations["dataset"] = load_json(annotations_path)
+        self.annotations["imgs"] = {}
+        self.captions = {}
+
+        if "images" in self.annotations.dataset:
+            for img in self.annotations.dataset["images"]:
+                img_id = img["id"]
+                self.annotations["imgs"][img_id] = img
+                self.captions[img_id] = []
+
+        if "annotations" in self.annotations.dataset:
+            for ann in self.annotations.dataset["annotations"]:
+                img_id = ann["image_id"]
+                if img_id in self.captions:
+                    self.captions[img_id].append(ann["caption"])
+
+    def scale(self, img, scale_factor, resize_image_method="bicubic"):
+        """
+        Scales an image by a specified factor.
+
+        This function resizes the input image using the specified resizing method.
+
+        Args:
+            img (np.ndarray): The input image to be resized.
+            scale_factor (float): The factor by which to scale the image.
+            resize_image_method (str, optional): The method to use for resizing the image (default is "bicubic").
+
+        Returns:
+            np.ndarray: The resized image (np.ndarray).
+        """
+        return RESIZE_METHODS.get(resize_image_method)(img, scale_factor)
+
+    def show(self, image, caption):
+        """
+        Displays an image with its caption.
+
+        This function takes an image represented as a NumPy array and a caption,
+        visualizing the image with the caption.
+
+        Args:
+            image (np.ndarray): The image to display.
+            caption (str): The caption to display with the image.
+
+        Returns:
+            None: This function does not return any value.
+        """
+        img_with_caption = image.copy()
+        # You can use a library like PIL to draw the caption on the image if needed
+        # For simplicity, we'll just display the image and caption as text
+        cv2.namedWindow("Caption", cv2.WINDOW_NORMAL)
+        cv2.imshow("Caption", img_with_caption)
+        print(f"Caption: {caption}")
+        cv2.waitKey(0)
+
+    def __getitem__(self, index):
+        """
+        Retrieves an image and its associated caption from the dataset based on the given index.
+
+        This function accesses the dataset using the specified index to return the processed image
+        and its corresponding caption.
+
+        Args:
+            index (int): The index of the image in the dataset.
+
+        Returns:
+            tuple: A tuple containing the processed image (np.ndarray) and the caption (str).
+        """
+        img_id = self.ids[index]
+        path = self.annotations.imgs[img_id]["file_name"]
+        img = cv2.imread(str(Path(self.images_folder) / path))
+        img = self.scale(
+            img,
+            scale_factor=self.cfg.scale_factor,
+            resize_image_method=self.cfg.resize_image_method,
+        )
+        caption = self.captions[img_id][
+            0
+        ]  # Assuming there's one caption per image; modify as needed
+        return img, caption
+
+    def save(self, index, image, anns):
+        """
+        Saves an image and its caption to the output folder.
+
+        This function writes the image to the images output folder and saves the caption
+        to a text file named according to the image ID.
+
+        Args:
+            index (int): The index of the image in the dataset.
+            image (np.ndarray): The processed image to be saved.
+            caption (str): The caption to be saved.
+
+        Returns:
+            None: This function does not return any value.
+        """
+        img_id = self.ids[index]
+        image_name = self.annotations.imgs[img_id]["file_name"]
+        cv2.imwrite(str(Path(self.images_output_folder) / image_name), image)
+        self.output_annotations["annotations"].append(anns)
+
+    def __len__(self):
+        """
+        Returns the number of images in the dataset.
+
+        This function calculates and returns the total number of images available in
+        the dataset by determining the length of the internal list of image identifiers.
+
+        Returns:
+            int: The total number of images in the dataset.
+        """
+        return len(self.ids)
+
+    def close(self):
+        """
+        Optionally, save any results or annotations if needed.
+
+        For image captioning, this might not be required, but included for consistency.
+        """
+        save_json(
+            self.output_annotations,
+            self.labels_output_path,
+        )
+
+
+@COCO_TASKS.register(name="keypoint")
+class COCODatasetKeypoint(ResizableDataset):
+    """
+    A dataset class for handling COCO-format keypoint annotations, supporting image scaling, annotation filtering,
+    and image loading operations.
+
+    Attributes:
+        cfg (ConfigDict): Configuration dictionary containing paths and settings.
+        images_folder (str): Path to the folder containing images.
+        ids (list): List of valid image IDs.
+        id2name (dict): Mapping from category ID to category name.
+        name2id (dict): Mapping from category name to category ID.
+        id2color (dict): Mapping from category ID to a unique color.
+        id2cat (dict): Mapping from category ID to category details.
+        images_output_folder (str): Path to the folder where processed images will be saved.
+        labels_output_path (str): Path to the file where output annotations will be saved.
+        output_annotations (dict): Dictionary containing the output annotations.
+
+    Methods:
+        __init__(images_path, annotations_path, cfg): Initializes the dataset with image paths, annotations, and configuration.
+        _create_annotations(annotations_path): Creates and initializes keypoint annotations from a JSON file.
+        _filter_valid_images(): Checks which images can be successfully loaded and returns a list of valid image IDs.
+        _filter_valid_annotations(): Updates annotations to include only those related to valid images.
+        scale(img, anns, scale_factor, resize_image_method="bicubic"): Scales the image and its keypoint annotations.
+        save(index, image, anns): Saves the processed image and annotations to the specified output folder.
+        show(image, anns): Displays the image with keypoint annotations.
+        __getitem__(index): Retrieves and processes an image and its annotations by index.
+        __len__(): Returns the number of valid images in the dataset.
+        close(): Saves the output annotations to a file.
+    """
+
+    def __init__(self, images_path, annotations_path, cfg):
+        """
+        Initializes the COCODatasetKeypoint with image paths, annotations, and configuration.
+
+        Args:
+            images_path (str): Path to the folder containing images.
+            annotations_path (str): Path to the JSON file containing annotations.
+            cfg (ConfigDict): Configuration dictionary containing paths and settings.
+        """
+        self.cfg = cfg
+        self.images_folder = images_path
+        self._create_annotations(annotations_path)
+        # Validate images and filter out invalid indices
+        self.ids = self._filter_valid_images()
+        self._filter_valid_annotations()  # New method to filter annotations
+        self.id2name = {k: v["name"] for k, v in self.annotations.cats.items()}
+        self.name2id = {v: k for k, v in self.id2name.items()}
+        self.id2color = generate_n_unique_colors(self.id2name.keys())
+        self.id2cat = self.annotations.cats
+
+        # To save
+        self.images_output_folder = self.cfg.images_output_path
+        self.labels_output_path = self.cfg.labels_output_path
+        # Initialize the updated COCO dictionary
+        self.output_annotations = {
+            "images": [],
+            "annotations": [],
+            "categories": list(self.annotations["cats"].values()),
+        }
+        if self.cfg.save:
+            ensure_folder_exist(Path(self.images_output_folder))
+
+    def _create_annotations(self, annotations_path):
+        """
+        Creates and initializes keypoint annotations for a dataset from a JSON file.
+
+        Args:
+            annotations_path (str): Path to the JSON file containing annotations.
+        """
+        self.annotations = ConfigDict()
+        self.annotations["dataset"] = load_json(annotations_path)
+        self.annotations["anns"], self.annotations["cats"], self.annotations["imgs"] = (
+            {},
+            {},
+            {},
+        )
+        self.annotations["imgToAnns"], self.annotations["catToImgs"] = (
+            ConfigDict(),
+            ConfigDict(),
+        )
+        if "annotations" in self.annotations.dataset:
+            for ann in self.annotations.dataset["annotations"]:
+                if ann["image_id"] not in self.annotations.imgToAnns:
+                    self.annotations.imgToAnns[ann["image_id"]] = []
+                self.annotations.imgToAnns[ann["image_id"]].append(ann)
+                self.annotations["anns"][ann["id"]] = ann
+        if "images" in self.annotations.dataset:
+            for img in self.annotations.dataset["images"]:
+                self.annotations["imgs"][img["id"]] = img
+        if "categories" in self.annotations.dataset:
+            for cat in self.annotations.dataset["categories"]:
+                self.annotations["cats"][cat["id"]] = cat
+
+        # Populate category to images mapping
+        for ann in self.annotations["anns"].values():
+            cat_id = ann["category_id"]
+            img_id = ann["image_id"]
+            if cat_id not in self.annotations["catToImgs"]:
+                self.annotations["catToImgs"][cat_id] = []
+            self.annotations["catToImgs"][cat_id].append(img_id)
+
+    def _filter_valid_images(self):
+        """
+        Checks which images can be successfully loaded and returns a list of valid image IDs.
+
+        Returns:
+            list: A list of valid image IDs.
+        """
+        valid_ids = []
+        for img_id in self.annotations.imgs.keys():
+            path = self.annotations.imgs[img_id]["file_name"]
+            img_path = str(Path(self.images_folder) / path)
+            if not os.path.exists(img_path):
+                LOGGER.info(
+                    f"Can't open filepath {img_path}, it could not exist or be corrupted."
+                )
+                continue
+            img = cv2.imread(img_path)
+            if img is not None:
+                valid_ids.append(img_id)
+            else:
+                LOGGER.info(
+                    f"Can't open/read file: check file path/integrity {img_path}"
+                )
+        return valid_ids
+
+    def _filter_valid_annotations(self):
+        """
+        Updates annotations to include only those related to valid images.
+        """
+        valid_img_ids = set(self.ids)
+
+        self.annotations["imgs"] = {
+            img_id: img
+            for img_id, img in self.annotations["imgs"].items()
+            if img_id in valid_img_ids
+        }
+
+        self.annotations["anns"] = {
+            ann_id: ann
+            for ann_id, ann in self.annotations["anns"].items()
+            if ann["image_id"] in valid_img_ids
+        }
+
+        self.annotations["imgToAnns"] = {
+            img_id: anns
+            for img_id, anns in self.annotations["imgToAnns"].items()
+            if img_id in valid_img_ids
+        }
+
+    def scale(self, img, anns, scale_factor, resize_image_method="bicubic"):
+        """
+        Scales the image and its keypoint annotations.
+
+        Args:
+            img (ndarray): The image to be scaled.
+            anns (list): List of annotations associated with the image.
+            scale_factor (float): Factor by which to scale the image and keypoints.
+            resize_image_method (str): Method used to resize the image. Defaults to "bicubic".
+
+        Returns:
+            tuple: Scaled image and annotations.
+        """
+        img = RESIZE_METHODS.get(resize_image_method)(img, scale_factor)
+        for ann in anns:
+            if "keypoints" in ann:
+                keypoints = ann["keypoints"]
+                scaled_keypoints = []
+                for i in range(0, len(keypoints), 3):
+                    x = keypoints[i] * scale_factor
+                    y = keypoints[i + 1] * scale_factor
+                    v = keypoints[i + 2]  # visibility flag remains the same
+                    scaled_keypoints.extend([x, y, v])
+                ann["keypoints"] = scaled_keypoints
+        return img, anns
+
+    def save(self, index, image, anns):
+        """
+        Saves the processed image and annotations to the specified output folder.
+
+        Args:
+            index (int): Index of the image in the dataset.
+            image (ndarray): Processed image to be saved.
+            anns (list): List of processed annotations.
+        """
+        img_id = self.ids[index]
+        image_name = self.annotations.imgs[img_id]["file_name"]
+        cv2.imwrite(str(Path(self.images_output_folder) / image_name), image)
+        # Save the annotations in the new COCO format
+        for ann in anns:
+            if ann["id"] not in {
+                a["id"] for a in self.output_annotations["annotations"]
+            }:
+                self.output_annotations["annotations"].append(ann)
+
+        # Include the image info in the output dictionary
+        if img_id not in {img["id"] for img in self.output_annotations["images"]}:
+            self.output_annotations["images"].append(self.annotations.imgs[img_id])
+
+    def show(self, image, anns):
+        """
+        Displays the image with keypoint annotations.
+
+        Args:
+            image (ndarray): Image to be displayed.
+            anns (list): List of annotations to be displayed on the image.
+        """
+        img_with_annotations = image.copy()
+        for ann in anns:
+            if "keypoints" in ann:
+                class_id = (
+                    ann["category_id"].item()
+                    if isinstance(ann["category_id"], torch.Tensor)
+                    else ann["category_id"]
+                )
+                category_info = self.id2cat.get(class_id, {})
+                label = {
+                    "skeleton": category_info.get("skeleton", []),
+                }
+                print(f"category_info {category_info}")
+                img_with_annotations = VISUALIZATION_REGISTRY.keypoints(
+                    img_with_annotations, ann["keypoints"], label=label
+                )
+        cv2.namedWindow("Annotations", cv2.WINDOW_NORMAL)
+        cv2.imshow("Annotations", img_with_annotations)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+    def __getitem__(self, index):
+        """
+        Retrieves and processes an image and its annotations by index.
+
+        Args:
+            index (int): Index of the image in the dataset.
+
+        Returns:
+            tuple: Processed image and annotations.
+        """
+        img_id = self.ids[index]
+        ann_ids = (
+            [ann["id"] for ann in self.annotations.imgToAnns[img_id]]
+            if img_id in self.annotations.imgToAnns
+            else []
+        )
+        anns = [self.annotations.anns[idx] for idx in ann_ids]
+        path = self.annotations.imgs[img_id]["file_name"]
+        img = cv2.imread(str(Path(self.images_folder) / path))
+
+        if img is None:
+            raise RuntimeError(f"Failed to load image at path {path}")
+
+        img, anns = self.scale(
+            img,
+            anns,
+            scale_factor=self.cfg.scale_factor,
+            resize_image_method=self.cfg.resize_image_method,
+        )
+        if self.cfg.save:
+            self.save(index, img, anns)
+        return img, [anns]
+
+    def __len__(self):
+        """
+        Returns the number of valid images in the dataset.
+
+        Returns:
+            int: Number of valid images.
+        """
+        return len(self.ids)
+
+    def close(self):
+        """
+        Saves the output annotations to a file.
+        """
+        save_json(self.output_annotations, self.labels_output_path)

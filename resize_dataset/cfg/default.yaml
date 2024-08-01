@@ -1,13 +1,13 @@
 dataset_format: "coco"
-dataset_task: "panoptic"
+dataset_task: "keypoint"
 task: scale
 scale_factor: 4
 image_shape: null # or [H,W]
 resize_image_method: "bicubic"
 resize_mask_method: "nearest"
 show: False
-save: False
-images_path: "/home/fjganan/GitHub/datasets/coco_dataset/val2017"
-labels_path: "/home/fjganan/GitHub/datasets/coco_dataset/panoptic_val2017.json"
-images_output_path: "/home/fjganan/GitHub/resize-dataset/results/coco_dataset/images/"
-labels_output_path: "/home/fjganan/GitHub/resize-dataset/results/coco_dataset/panoptic_val2017.json"
+save: True
+images_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\val2017"
+labels_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\annotations\\person_keypoints_val2017.json"
+images_output_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\test\\images"
+labels_output_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\test\\person_keypoints_val2017.json"
