@@ -1,5 +1,5 @@
 dataset_format: "coco"
-dataset_task: "keypoint"
+dataset_task: "captioning"
 task: scale
 scale_factor: 4
 image_shape: null # or [H,W]
@@ -8,6 +8,6 @@ resize_mask_method: "nearest"
 show: False
 save: True
 images_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\val2017"
-labels_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\annotations\\person_keypoints_val2017.json"
-images_output_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\test\\images"
-labels_output_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\test\\person_keypoints_val2017.json"
+labels_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\coco_all\\archive\\coco2017\\annotations\\captions_val2017.json"
+images_output_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\test_caption\\images"
+labels_output_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\test_caption\\captions_val2017.json"

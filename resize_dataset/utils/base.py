@@ -14,6 +14,11 @@ MACOS, LINUX, WINDOWS = (
     platform.system() == x for x in ["Darwin", "Linux", "Windows"]
 )  # environment booleans
 LOGGING_NAME = "ResizeDataset"
+TQDM_BAR_FORMAT_GREEN = "%s{l_bar}%s{bar}%s{r_bar}" % (
+    "\033[0;32m",
+    "\033[0;32m",
+    "\033[0;32m",
+)
 
 
 def load_json(path):

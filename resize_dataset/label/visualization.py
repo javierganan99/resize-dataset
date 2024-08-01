@@ -181,6 +181,22 @@ def add_keypoints(
     keypoint_radius=5,
     skeleton_thickness=2,
 ):
+    """
+    Draw keypoints and optional skeleton on an image.
+
+    Parameters:
+    - image (ndarray): The image to which keypoints and skeleton will be drawn.
+    - keypoints (list or ndarray): A list or array of keypoints, where each keypoint is a tuple of (x, y, visibility).
+    - label (dict, optional): A dictionary containing the skeleton structure if available.
+      It should have a key "skeleton" which is a list of tuples, where each tuple contains two indices (start_joint, end_joint).
+    - keypoint_color (tuple, optional): Color of the keypoints in BGR format. Default is green (0, 255, 0).
+    - skeleton_color (tuple, optional): Color of the skeleton lines in BGR format. Default is red (255, 0, 0).
+    - keypoint_radius (int, optional): Radius of the keypoints to be drawn. Default is 5.
+    - skeleton_thickness (int, optional): Thickness of the skeleton lines. Default is 2.
+
+    Returns:
+    - ndarray: The image with keypoints and skeleton drawn on it.
+    """
     keypoints = np.array(keypoints).reshape(-1, 3)
 
     for x, y, v in keypoints:
@@ -205,9 +221,31 @@ def add_keypoints(
     return image
 
 
+def add_dense_poses(image, ann, point_color=(0, 255, 0), point_radius=2):
+    """
+    Draw dense pose points on an image.
+
+    Parameters:
+    - image (ndarray): The image to which dense pose points will be drawn.
+    - ann (dict): A dictionary containing dense pose annotations. It should have keys "densepose" with values being
+      dictionaries containing "u" and "v" which are lists or arrays of u and v coordinates of the dense pose points.
+    - point_color (tuple, optional): Color of the dense pose points in BGR format. Default is green (0, 255, 0).
+    - point_radius (int, optional): Radius of the dense pose points to be drawn. Default is 2.
+
+    Returns:
+    - ndarray: The image with dense pose points drawn on it.
+    """
+    u_coords = np.array(ann["densepose"]["u"]).astype(int)
+    v_coords = np.array(ann["densepose"]["v"]).astype(int)
+    for u, v in zip(u_coords, v_coords):
+        cv2.circle(image, (u, v), point_radius, point_color, -1)
+    return image
+
+
 VISUALIZATION_REGISTRY = ConfigDict(
     bbox=add_bounding_box,
     mask=add_mask,
     polygons=add_polygons,
     keypoints=add_keypoints,
+    dense_pose=add_dense_poses,
 )
