@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 from resize_dataset.utils import ConfigDict
+import pycocotools.mask as mask_util
 
 
 def add_bounding_box(
@@ -221,25 +223,61 @@ def add_keypoints(
     return image
 
 
-def add_dense_poses(image, ann, point_color=(0, 255, 0), point_radius=2):
+def add_dense_poses(image, anns):
     """
-    Draw dense pose points on an image.
+    Creates a figure with subplots showing only DensePose annotations.
 
-    Parameters:
-    - image (ndarray): The image to which dense pose points will be drawn.
-    - ann (dict): A dictionary containing dense pose annotations. It should have keys "densepose" with values being
-      dictionaries containing "u" and "v" which are lists or arrays of u and v coordinates of the dense pose points.
-    - point_color (tuple, optional): Color of the dense pose points in BGR format. Default is green (0, 255, 0).
-    - point_radius (int, optional): Radius of the dense pose points to be drawn. Default is 2.
+    Args:
+        image (np.ndarray): The input image to annotate.
+        anns (list of dict): List of annotations containing DensePose data.
 
     Returns:
-    - ndarray: The image with dense pose points drawn on it.
+        fig (matplotlib.figure.Figure): The resulting figure with annotations.
     """
-    u_coords = np.array(ann["densepose"]["u"]).astype(int)
-    v_coords = np.array(ann["densepose"]["v"]).astype(int)
-    for u, v in zip(u_coords, v_coords):
-        cv2.circle(image, (u, v), point_radius, point_color, -1)
-    return image
+
+    fig, axs = plt.subplots(1, 3, figsize=[15, 5])
+
+    extent = [0, image.shape[1], image.shape[0], 0]
+
+    axs[0].imshow(image, extent=extent)
+    axs[0].axis("off")
+    axs[0].set_title("Patch Indices")
+
+    axs[1].imshow(image, extent=extent)
+    axs[1].axis("off")
+    axs[1].set_title("U Coordinates")
+
+    axs[2].imshow(image, extent=extent)
+    axs[2].axis("off")
+    axs[2].set_title("V Coordinates")
+
+    for ann in anns:
+        bbr = np.round(ann["bbox"]).astype(int)
+        if "dp_masks" in ann:
+            Point_x = np.array(ann["dp_x"]) / 255.0 * bbr[2]
+            Point_y = np.array(ann["dp_y"]) / 255.0 * bbr[3]
+            Point_I = np.array(ann["dp_I"])
+            Point_U = np.array(ann["dp_U"])
+            Point_V = np.array(ann["dp_V"])
+
+            x1, y1, x2, y2 = bbr[0], bbr[1], bbr[0] + bbr[2], bbr[1] + bbr[3]
+            x2 = min(x2, image.shape[1])
+            y2 = min(y2, image.shape[0])
+
+            Point_x += x1
+            Point_y += y1
+
+            plt.subplot(1, 3, 1)
+            plt.scatter(Point_x, Point_y, 22, Point_I)
+            plt.subplot(1, 3, 2)
+            plt.scatter(Point_x, Point_y, 22, Point_U)
+            plt.subplot(1, 3, 3)
+            plt.scatter(Point_x, Point_y, 22, Point_V)
+
+    for ax in axs:
+        ax.set_aspect("equal")
+
+    return fig
 
 
 VISUALIZATION_REGISTRY = ConfigDict(
@@ -247,5 +285,5 @@ VISUALIZATION_REGISTRY = ConfigDict(
     mask=add_mask,
     polygons=add_polygons,
     keypoints=add_keypoints,
-    dense_pose=add_dense_poses,
+    densepose=add_dense_poses,
 )
