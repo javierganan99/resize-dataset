@@ -122,6 +122,8 @@ class COCODataset(ResizableDataset):
         self.images_output_folder = self.cfg.images_output_path
         self.labels_output_path = self.cfg.labels_output_path
         self.output_annotations = self.annotations.dataset
+        self.output_annotations["annotations"] = []
+        self.output_annotations["images"] = []
 
     def _create_annotations(self, annotations_path):
         """
@@ -234,9 +236,12 @@ class COCODataset(ResizableDataset):
             None: This function does not return a value.
         """
         img_id = self.ids[index]
-        image_name = self.annotations.imgs[img_id]["file_name"]
-        cv2.imwrite(str(Path(self.images_output_folder) / image_name), image)
+        img_ann = self.annotations.imgs[img_id]
+        cv2.imwrite(str(Path(self.images_output_folder) / img_ann["file_name"]), image)
         self.output_annotations["annotations"].append(anns)
+        img_ann["width"] *= self.cfg.scale_factor
+        img_ann["height"] *= self.cfg.scale_factor
+        self.output_annotations["images"].append(img_ann)
 
     def show(self, image, anns):
         """
@@ -423,6 +428,8 @@ class COCODatasetPanoptic(ResizableDataset):
             self.labels_output_folder = self.cfg.labels_output_path
             self.labels_output_path = self.cfg.labels_output_path + ".json"
         self.output_annotations = self.annotations.dataset
+        self.output_annotations["annotations"] = []
+        self.output_annotations["images"] = []
 
     def _create_annotations(self, annotations_path):
         """
@@ -511,13 +518,16 @@ class COCODatasetPanoptic(ResizableDataset):
         """
         annotation, scaled_mask = anns
         img_id = self.ids[index]
-        image_name = self.annotations.imgs[img_id]["file_name"]
-        cv2.imwrite(str(Path(self.images_output_folder) / image_name), image)
+        img_ann = self.annotations.imgs[img_id]
+        cv2.imwrite(str(Path(self.images_output_folder) / img_ann["file_name"]), image)
         cv2.imwrite(
             str(Path(self.labels_output_folder) / annotation["file_name"]),
             scaled_mask,
         )
         self.output_annotations["annotations"].append(annotation)
+        img_ann["width"] *= self.cfg.scale_factor
+        img_ann["height"] *= self.cfg.scale_factor
+        self.output_annotations["images"].append(img_ann)
 
     def show(self, image, anns):
         """
