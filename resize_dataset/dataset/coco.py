@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import torch
 import numpy as np
 import os
+import base64
 import pycocotools.mask as mask_utils
 from pycocotools import _mask as coco_mask
 from resize_dataset.image import RESIZE_METHODS
@@ -706,7 +707,6 @@ class COCODatasetDensePose(ResizableDataset):
                             (w * scale_factor, h * scale_factor),
                             interpolation=cv2.INTER_NEAREST,
                         ).astype(np.uint8)
-
                         if isinstance(dp_mask['counts'], str):
                             ann["dp_masks"][idx]["counts"] = binary_mask_to_rle_coded(
                                 resized_mask
@@ -715,21 +715,23 @@ class COCODatasetDensePose(ResizableDataset):
                             ann["dp_masks"][idx]["counts"] = mask_to_rle(
                                 resized_mask, order="F"
                             )
+                        print(f"Soy la mask after {ann['dp_masks'][idx]['counts']}")
                         ann["dp_masks"][idx]["size"] = [
                             h * scale_factor,
                             w * scale_factor,]
-        print(f"Soy ann after {anns}")
+        print(f"Soy anns after {anns}")           
         return img, anns
-
+    
     def show(self, image, anns):
         """
         Displays an image with DensePose annotations such as DensePose coordinates.
         """
         img_with_annotations = image.copy()
-        img_with_annotations = VISUALIZATION_REGISTRY.densepose(img_with_annotations, anns)
+        VISUALIZATION_REGISTRY.densepose(img_with_annotations, anns)
         plt.show(block=False) 
         plt.waitforbuttonpress()  
         plt.close(img_with_annotations)
+
 
     def __getitem__(self, index):
         """
