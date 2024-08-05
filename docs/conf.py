@@ -20,10 +20,9 @@ release = "0.0.1"
 
 add_module_names = False
 extensions = [
-    "sphinx.ext.todo",
-    "sphinx.ext.viewcode",
     "sphinx.ext.autodoc",
-    "sphinx.ext.autodoc.preserve_defaults",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.githubpages",
 ]
 
 templates_path = ["_templates"]
