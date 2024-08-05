@@ -2,7 +2,7 @@ dataset_format: "coco"
 dataset_task: "panoptic"
 task: scale
 scale_factor: 4
-image_shape: null # or [H,W]
+image_shape: null # or [W,H]
 resize_image_method: "bicubic"
 resize_mask_method: "nearest"
 show: False

@@ -122,6 +122,8 @@ class COCODataset(ResizableDataset):
         self.images_output_folder = self.cfg.images_output_path
         self.labels_output_path = self.cfg.labels_output_path
         self.output_annotations = self.annotations.dataset
+        self.output_annotations["annotations"] = []
+        self.output_annotations["images"] = []
 
     def _create_annotations(self, annotations_path):
         """
@@ -218,6 +220,66 @@ class COCODataset(ResizableDataset):
             ann["area"] *= scale_factor**2
         return img, anns
 
+    def reshape(self, img, anns, shape, resize_image_method="bicubic"):
+        """
+        Reshapes an image and its corresponding annotations to a specified size.
+
+        This function resizes the input image and scales the bounding boxes and
+        segmentation annotations according to the new dimensions. It offers the
+        option to specify the method used for resizing the image.
+
+        Args:
+            img (np.ndarray): The input image to be resized.
+            anns (list[dict]): A list of annotations corresponding to the image,
+                each containing at least a "bbox" key and optionally "segmentation".
+            shape (tuple): The desired output shape of the image as (width, height).
+            resize_image_method (str, optional): The method used for resizing the
+                image, default is "bicubic". Other methods can be defined in
+                RESIZE_METHODS.
+
+        Returns:
+            tuple: A tuple containing the resized image (np.ndarray) and the updated
+            annotations (list[dict]).
+        """
+        h0, w0 = img.shape[:2]
+        wn, hn = shape
+        xf = wn / w0
+        yf = hn / h0
+        img = RESIZE_METHODS.get(resize_image_method)(img, shape)
+        for ann in anns:
+            x1, y1, w, h = ann["bbox"]
+            ann["bbox"] = [x1 * xf, y1 * yf, w * xf, h * yf]
+            if "segmentation" in ann:
+                if isinstance(ann["segmentation"], list):  # Segmentation polygon
+                    for i, polygon in enumerate(ann["segmentation"]):
+                        ann["segmentation"][i] = [
+                            c * xf if i % 2 == 0 else c * yf
+                            for i, c in enumerate(polygon)
+                        ]
+                else:
+                    seg = ann["segmentation"]
+                    h0, w0 = seg["size"]
+                    xf = wn / w0
+                    yf = hn / h0
+                    if isinstance(ann["segmentation"]["counts"], str):
+                        mask = mask_utils.decode(ann["segmentation"])
+                    else:
+                        mask = rle_to_mask(seg["counts"], h0, w0, order="F")
+                    resized_mask = cv2.resize(
+                        mask, shape, interpolation=cv2.INTER_NEAREST
+                    ).astype(np.uint8)
+                    if isinstance(ann["segmentation"]["counts"], str):
+                        ann["segmentation"]["counts"] = binary_mask_to_rle_coded(
+                            resized_mask
+                        )
+                    else:
+                        ann["segmentation"]["counts"] = mask_to_rle(
+                            resized_mask, order="F"
+                        )
+                    ann["segmentation"]["size"] = [hn, wn]
+            ann["area"] *= xf * yf
+        return img, anns
+
     def save(self, index, image, anns):
         """
         Saves an image and its annotations to the output folder and dictionary.
@@ -234,9 +296,19 @@ class COCODataset(ResizableDataset):
             None: This function does not return a value.
         """
         img_id = self.ids[index]
-        image_name = self.annotations.imgs[img_id]["file_name"]
-        cv2.imwrite(str(Path(self.images_output_folder) / image_name), image)
+        img_ann = self.annotations.imgs[img_id]
+        cv2.imwrite(str(Path(self.images_output_folder) / img_ann["file_name"]), image)
         self.output_annotations["annotations"].append(anns)
+        if self.cfg.image_shape is None:
+            sfx = self.cfg.scale_factor
+            sfy = self.cfg.scale_factor
+        else:
+            wn, hn = self.cfg.image_shape
+            sfx = wn / img_ann["width"]
+            sfy = hn / img_ann["height"]
+        img_ann["width"] *= sfx
+        img_ann["height"] *= sfy
+        self.output_annotations["images"].append(img_ann)
 
     def show(self, image, anns):
         """
@@ -320,10 +392,15 @@ class COCODataset(ResizableDataset):
         anns = [self.annotations.anns[idx] for idx in ann_ids]
         path = self.annotations.imgs[img_id]["file_name"]
         img = cv2.imread(str(Path(self.images_folder) / path))
-        img, anns = self.scale(
+        resize_function, resize_parameter = (
+            (self.scale, self.cfg.scale_factor)
+            if self.cfg.image_shape is None
+            else (self.reshape, self.cfg.image_shape)
+        )
+        img, anns = resize_function(
             img,
             anns,
-            scale_factor=self.cfg.scale_factor,
+            resize_parameter,
             resize_image_method=self.cfg.resize_image_method,
         )
         if self.cfg.save:
@@ -423,6 +500,8 @@ class COCODatasetPanoptic(ResizableDataset):
             self.labels_output_folder = self.cfg.labels_output_path
             self.labels_output_path = self.cfg.labels_output_path + ".json"
         self.output_annotations = self.annotations.dataset
+        self.output_annotations["annotations"] = []
+        self.output_annotations["images"] = []
 
     def _create_annotations(self, annotations_path):
         """
@@ -492,6 +571,43 @@ class COCODatasetPanoptic(ResizableDataset):
             seg_info["area"] *= scale_factor**2
         return img, (anns, scaled_segmentation)
 
+    def reshape(self, img, anns, shape, resize_image_method="bicubic"):
+        """
+        Reshapes an image and its corresponding segmentation annotations to a specified size.
+
+        This function resizes the input image using a specified interpolation method
+        and adjusts the corresponding segmentation annotations to match the new dimensions.
+
+        Args:
+            img (np.ndarray): The input image to be resized.
+            anns (dict): The annotations corresponding to the image, including
+                segmentation information.
+            shape (tuple): The desired shape for the output image as (width, height).
+            resize_image_method (str, optional): The method to use for resizing the image
+                (default is "bicubic").
+
+        Returns:
+            tuple: A tuple containing the resized image (np.ndarray) and a tuple of updated
+                annotations (dict) along with the resized segmentation mask (np.ndarray).
+        """
+        h0, w0 = img.shape[:2]
+        wn, hn = shape
+        xf = wn / w0
+        yf = hn / h0
+        img = RESIZE_METHODS.get(resize_image_method)(img, shape)
+        seg_path = str(self.annotations_folder / anns["file_name"])
+        seg_img = cv2.imread(seg_path, cv2.IMREAD_COLOR)
+        scaled_segmentation = cv2.resize(
+            seg_img,
+            shape,
+            interpolation=cv2.INTER_NEAREST,
+        )
+        for seg_info in anns["segments_info"]:
+            x1, y1, w, h = seg_info["bbox"]
+            seg_info["bbox"] = [x1 * xf, y1 * yf, w * xf, h * yf]
+            seg_info["area"] *= xf * yf
+        return img, (anns, scaled_segmentation)
+
     def save(self, index, image, anns):
         """
         Saves an image and its annotations to the output folders and dictionary.
@@ -511,13 +627,23 @@ class COCODatasetPanoptic(ResizableDataset):
         """
         annotation, scaled_mask = anns
         img_id = self.ids[index]
-        image_name = self.annotations.imgs[img_id]["file_name"]
-        cv2.imwrite(str(Path(self.images_output_folder) / image_name), image)
+        img_ann = self.annotations.imgs[img_id]
+        cv2.imwrite(str(Path(self.images_output_folder) / img_ann["file_name"]), image)
         cv2.imwrite(
             str(Path(self.labels_output_folder) / annotation["file_name"]),
             scaled_mask,
         )
         self.output_annotations["annotations"].append(annotation)
+        if self.cfg.image_shape is None:
+            sfx = self.cfg.scale_factor
+            sfy = self.cfg.scale_factor
+        else:
+            wn, hn = self.cfg.image_shape
+            sfx = wn / img_ann["width"]
+            sfy = hn / img_ann["height"]
+        img_ann["width"] *= sfx
+        img_ann["height"] *= sfy
+        self.output_annotations["images"].append(img_ann)
 
     def show(self, image, anns):
         """
@@ -583,10 +709,15 @@ class COCODatasetPanoptic(ResizableDataset):
         img_info = self.annotations.imgs[img_id]
         img = cv2.imread(str(Path(self.images_folder) / img_info["file_name"]))
         anns = self.annotations.anns[img_id]
-        img, anns = self.scale(
+        resize_function, resize_parameter = (
+            (self.scale, self.cfg.scale_factor)
+            if self.cfg.image_shape is None
+            else (self.reshape, self.cfg.image_shape)
+        )
+        img, anns = resize_function(
             img,
             anns,
-            scale_factor=self.cfg.scale_factor,
+            resize_parameter,
             resize_image_method=self.cfg.resize_image_method,
         )
         if self.cfg.save:
