@@ -4,7 +4,7 @@ This repository provides tools to resize computer vision datasets, enabling the 
 
 ## ⚠️ Disclaimer
 
-This repository is under development.
+This repository is under continous development.
 
 ## 📋 Features
 
