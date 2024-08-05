@@ -10,7 +10,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-project = "Resize_Dataset"
+project = "Resize Dataset"
 copyright = "2024, Francisco Javier Gañan, German Ferrando"
 author = "Francisco Javier Gañan, German Ferrando"
 release = "0.0.1"
