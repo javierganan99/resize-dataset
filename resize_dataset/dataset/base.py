@@ -16,9 +16,6 @@ class ResizableDataset(Dataset, ABC):
         show(image, anns): Displays the image along with its annotations.
         __getitem__(index): Retrieves the image and annotations at the specified index.
         __len__(): Returns the total number of items in the dataset.
-
-    Private Methods:
-        None
     """
 
     @abstractmethod
