@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -e .
-          pip install sphinx sphinx_rtd_theme myst-parser
+          pip install sphinx sphinx_rtd_theme recommonmark
       - name: Sphinx build
         run: |
           sphinx-apidoc --output-dir docs resize_dataset/ --separate
