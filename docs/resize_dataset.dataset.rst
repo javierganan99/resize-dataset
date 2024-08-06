@@ -1,10 +1,10 @@
-resize\_dataset.dataset package
+dataset package
 ===============================
 
 Submodules
 ----------
 
-resize\_dataset.dataset.base module
+dataset.base module
 -----------------------------------
 
 .. automodule:: resize_dataset.dataset.base
@@ -12,7 +12,7 @@ resize\_dataset.dataset.base module
    :undoc-members:
    :show-inheritance:
 
-resize\_dataset.dataset.coco module
+dataset.coco module
 -----------------------------------
 
 .. automodule:: resize_dataset.dataset.coco
@@ -20,7 +20,7 @@ resize\_dataset.dataset.coco module
    :undoc-members:
    :show-inheritance:
 
-resize\_dataset.dataset.utils module
+dataset.utils module
 ------------------------------------
 
 .. automodule:: resize_dataset.dataset.utils

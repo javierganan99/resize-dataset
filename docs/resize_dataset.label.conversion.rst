@@ -1,4 +1,4 @@
-resize\_dataset.label.conversion module
+label.conversion module
 =======================================
 
 .. automodule:: resize_dataset.label.conversion

@@ -1,4 +1,4 @@
-resize\_dataset.cfg package
+cfg package
 ===========================
 
 Module contents
