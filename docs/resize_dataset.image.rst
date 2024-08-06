@@ -1,10 +1,10 @@
-resize\_dataset.image package
+image package
 =============================
 
 Submodules
 ----------
 
-resize\_dataset.image.resize module
+resize module
 -----------------------------------
 
 .. automodule:: resize_dataset.image.resize

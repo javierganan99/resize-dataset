@@ -1,4 +1,4 @@
-resize\_dataset.image.resize module
+image.resize module
 ===================================
 
 .. automodule:: resize_dataset.image.resize

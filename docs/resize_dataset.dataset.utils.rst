@@ -1,4 +1,4 @@
-resize\_dataset.dataset.utils module
+dataset.utils module
 ====================================
 
 .. automodule:: resize_dataset.dataset.utils
