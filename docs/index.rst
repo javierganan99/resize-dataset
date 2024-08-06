@@ -1,9 +1,9 @@
-.. Resize_Dataset documentation master file, created by
-   sphinx-quickstart on Mon Aug  5 10:56:35 2024.
+.. resize-dataset documentation master file, created by
+   sphinx-quickstart on Mon Aug  5 15:05:05 2024.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Resize_Dataset documentation
+resize-dataset documentation
 ============================
 
 Add your content using ``reStructuredText`` syntax. See the

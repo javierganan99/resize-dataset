@@ -5,4 +5,3 @@ resize-dataset
    :maxdepth: 4
 
    resize_dataset
-   tests

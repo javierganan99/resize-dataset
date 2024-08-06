@@ -10,7 +10,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-project = "Resize_Dataset"
+project = "Resize Dataset"
 copyright = "2024, Francisco Javier Gañan, German Ferrando"
 author = "Francisco Javier Gañan, German Ferrando"
 release = "0.0.1"
@@ -20,10 +20,9 @@ release = "0.0.1"
 
 add_module_names = False
 extensions = [
-    "sphinx.ext.todo",
-    "sphinx.ext.viewcode",
     "sphinx.ext.autodoc",
-    "sphinx.ext.autodoc.preserve_defaults",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.githubpages",
 ]
 
 templates_path = ["_templates"]
