@@ -9,6 +9,12 @@ from resize_dataset.utils import (
 from resize_dataset.dataset import DATASET_REGISTRY
 
 
+def custom_collate_fn(batch):
+    images = [item[0] for item in batch]
+    annotations = [item[1] for item in batch]
+    return images, annotations[0]
+
+
 class ResizeDataset:
     """
     Resizes and processes datasets based on specified tasks.
@@ -72,16 +78,20 @@ class ResizeDataset:
         Returns:
             None: This function does not return any value.
         """
-        dataloader = DataLoader(self.dataset, batch_size=1, shuffle=False)
+        # BUG: The actual collate function what does is to convert dict values to tensor and lists
+        # FIX: Converted to custom collate fn, must be discussed
+        # dataloader = DataLoader(
+        #     self.dataset, batch_size=1, shuffle=False, collate_fn=custom_collate_fn
+        # )
         for image, annotations in tqdm(
-            dataloader,
+            self.dataset,
             desc=colorstr("📏 Scaling dataset"),
-            total=len(dataloader),
+            total=len(self.dataset),
             bar_format=TQDM_BAR_FORMAT_GREEN,
             colour="green",
         ):
             if self.cfg.show:
-                self.dataset.show(image[0].numpy(), annotations[0])
+                self.dataset.show(image, annotations[0])
         self.dataset.close()
 
     @property

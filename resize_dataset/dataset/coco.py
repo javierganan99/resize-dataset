@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import torch
 import numpy as np
 import os
-import base64
 import pycocotools.mask as mask_utils
 from pycocotools import _mask as coco_mask
 from resize_dataset.image import RESIZE_METHODS
@@ -692,6 +691,7 @@ class COCODatasetDensePose(ResizableDataset):
         img = RESIZE_METHODS.get(resize_image_method)(img, scale_factor)
         # TODO: Check that the mask resizing is okey and include resizing of keypoints and segmentation fields
         for ann in anns:
+            print(f"Soy ann {ann}")
             if "dp_masks" in ann:
                 bbox = ann["bbox"]
                 ann["bbox"] = [coord * scale_factor for coord in bbox]
@@ -715,11 +715,10 @@ class COCODatasetDensePose(ResizableDataset):
                             ann["dp_masks"][idx]["counts"] = mask_to_rle(
                                 resized_mask, order="F"
                             )
-                        print(f"Soy la mask after {ann['dp_masks'][idx]['counts']}")
                         ann["dp_masks"][idx]["size"] = [
                             h * scale_factor,
                             w * scale_factor,]
-        print(f"Soy anns after {anns}")           
+            ann["area"] = ann["area"]
         return img, anns
     
     def show(self, image, anns):
@@ -727,11 +726,13 @@ class COCODatasetDensePose(ResizableDataset):
         Displays an image with DensePose annotations such as DensePose coordinates.
         """
         img_with_annotations = image.copy()
-        VISUALIZATION_REGISTRY.densepose(img_with_annotations, anns)
+        fig = VISUALIZATION_REGISTRY.densepose(img_with_annotations, anns)
         plt.show(block=False) 
         plt.waitforbuttonpress()  
-        plt.close(img_with_annotations)
-
+        plt.close(fig)
+        img_with_annotations = image.copy()
+        # TODO: Al guardar las anns mete en una lista el dp_mask["counts"] y hace todo con torch, cosa un poco rara, tambien hay que ver si las mascaras estan
+        # comprimidas y codificadas en base 64 o no en el original, debo modificar segmentation y keypoints y ya estaría
 
     def __getitem__(self, index):
         """
