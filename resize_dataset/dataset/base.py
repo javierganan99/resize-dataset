@@ -16,9 +16,6 @@ class ResizableDataset(Dataset, ABC):
         show(image, anns): Displays the image along with its annotations.
         __getitem__(index): Retrieves the image and annotations at the specified index.
         __len__(): Returns the total number of items in the dataset.
-
-    Private Methods:
-        None
     """
 
     @abstractmethod
@@ -50,6 +47,26 @@ class ResizableDataset(Dataset, ABC):
             img (np.ndarray): The image to be scaled, represented as a NumPy array.
             anns (list): A list of annotations associated with the image, which will also be scaled.
             scale_factor (float): The factor by which to scale the image and annotations.
+            resize_image_method (str): The method used for resizing the image.
+
+        Returns:
+            tuple: A tuple containing the scaled image (np.ndarray)
+                and the modified annotations (list).
+        """
+
+    @abstractmethod
+    def reshape(self, img, anns, shape, resize_image_method):
+        """
+        Reshape an image and its associated annotations by a specified factor.
+
+        This function adjusts the size of the input image and modifies the annotations accordingly
+        to maintain their relevance after resizing. The image can be resized using different methods
+        specified by the user.
+
+        Args:
+            img (np.ndarray): The image to be scaled, represented as a NumPy array.
+            anns (list): A list of annotations associated with the image, which will also be scaled.
+            shape (tuple): The new shape of the image and annotations.
             resize_image_method (str): The method used for resizing the image.
 
         Returns:
