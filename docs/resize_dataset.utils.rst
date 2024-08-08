@@ -1,10 +1,10 @@
-resize\_dataset.utils package
+utils package
 =============================
 
 Submodules
 ----------
 
-resize\_dataset.utils.base module
+utils.base module
 ---------------------------------
 
 .. automodule:: resize_dataset.utils.base

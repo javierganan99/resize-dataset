@@ -1,4 +1,4 @@
-resize\_dataset.label.visualization module
+label.visualization module
 ==========================================
 
 .. automodule:: resize_dataset.label.visualization

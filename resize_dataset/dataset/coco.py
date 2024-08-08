@@ -46,9 +46,7 @@ def rle_coded_to_binary_mask(rle_coded_str, im_height, im_width):
         values indicate the presence of the detected object(s) and False values
         indicate the absence.
     """
-    uncoded_str = base64.b64decode(rle_coded_str)
-    uncompressed_str = zlib.decompress(uncoded_str, wbits=zlib.MAX_WBITS)
-    detection = {"size": [im_height, im_width], "counts": uncompressed_str}
+    detection = {"size": [im_height, im_width], "counts": rle_coded_str}
     detlist = []
     detlist.append(detection)
     mask = coco_mask.decode(detlist)
@@ -75,8 +73,7 @@ def binary_mask_to_rle_coded(mask):
     """
     mask = mask.reshape(mask.shape[0], mask.shape[1], 1)
     encoded_mask = coco_mask.encode(np.asfortranarray(mask))[0]["counts"]
-    binary_str = zlib.compress(encoded_mask, zlib.Z_BEST_COMPRESSION)
-    return base64.b64encode(binary_str).decode()
+    return encoded_mask.decode("utf-8")
 
 
 @COCO_TASKS.register(name="segmentation")

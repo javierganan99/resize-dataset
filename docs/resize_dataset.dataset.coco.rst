@@ -1,4 +1,4 @@
-resize\_dataset.dataset.coco module
+dataset.coco module
 ===================================
 
 .. automodule:: resize_dataset.dataset.coco

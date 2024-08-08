@@ -1,10 +1,10 @@
-resize\_dataset.engine package
+engine package
 ==============================
 
 Submodules
 ----------
 
-resize\_dataset.engine.base module
+engine.base module
 ----------------------------------
 
 .. automodule:: resize_dataset.engine.base
