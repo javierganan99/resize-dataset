@@ -765,6 +765,49 @@ class COCODatasetPanoptic(ResizableDataset):
 class COCODatasetDensePose(ResizableDataset):
     """
     Dataset class for loading and processing images and DensePose annotations in COCO format.
+
+    This class enables the management of a dataset containing images and their associated
+    DensePose annotations formatted according to the COCO standard. It provides methods
+    for filtering valid images, scaling and reshaping images and annotations, and visualizing
+    the results.
+
+    Args:
+        images_path (str): Path to the folder containing images.
+        annotations_path (str): Path to the COCO JSON annotations file.
+        cfg (Config): Configuration object containing various settings.
+
+    Attributes:
+        cfg (Config): Configuration settings for the dataset.
+        images_folder (str): Path to the images folder.
+        ids (list[int]): List of valid image IDs.
+        id2name (dict[int, str]): Mapping from image IDs to image names.
+        name2id (dict[str, int]): Mapping from image names to image IDs.
+        id2color (dict[int, tuple[int]]): Mapping of image IDs to color values.
+        images_output_folder (str): Output folder for saving processed images.
+        labels_output_path (str): Path to save output annotations.
+        output_annotations (dict): Structure containing output annotations data.
+
+    Methods:
+        __getitem__(index): Retrieves and processes an image and its associated
+            DensePose annotations.
+        __len__(): Returns the number of images in the dataset.
+        save(index, image, anns): Saves the processed image and its
+            corresponding annotations.
+        close(): Saves all DensePose annotations to a JSON file specified in the
+            labels_output_path.
+        scale(img, anns, scale_factor, resize_image_method="bicubic"): Scales an
+            image and its associated DensePose annotations.
+        reshape(img, anns, shape, resize_image_method="bicubic"): Reshapes an
+            image and its corresponding annotations to a specified size.
+        show(image, anns): Displays an image with its associated DensePose annotations.
+
+    Private Methods:
+        _create_annotations(annotations_path): Creates and organizes annotations from
+            a specified JSON file.
+        _filter_valid_images(): Checks which images can be successfully loaded and
+            returns a list of valid image IDs.
+        _filter_valid_annotations(): Updates annotations to include only those related
+            to valid images.
     """
 
     def __init__(self, images_path, annotations_path, cfg):
@@ -829,17 +872,20 @@ class COCODatasetDensePose(ResizableDataset):
     def _filter_valid_images(self):
         """
         Checks which images can be successfully loaded and returns a list of valid image IDs.
+
+        Returns:
+            list: A list of valid image IDs.
         """
         valid_ids = []
         for img_id, img_data in self.annotations["imgs"].items():
             img_path = str(Path(self.images_folder) / img_data["file_name"])
             if not os.path.exists(img_path):
                 LOGGER.info(
-                    f"Can't open filepath {img_path}, it could not exist or be corrupted."
+                    "Can't open filepath %s, it could not exist or be corrupted.",
+                    img_path,
                 )
                 continue
-            else:
-                valid_ids.append(img_id)
+            valid_ids.append(img_id)
         return valid_ids
 
     def _filter_valid_annotations(self):
@@ -867,34 +913,33 @@ class COCODatasetDensePose(ResizableDataset):
         """
         Scales an image and its associated DensePose annotations by a specified factor.
 
-        This function rescales the input image and adjusts the DensePose annotations (including bounding boxes, masks,
-        keypoints, and segmentations) according to the given `scale_factor`. The annotations are modified in place
-        to reflect the new scale.
+        This function rescales the input image and adjusts the DensePose annotations
+        (including bounding boxes, masks, keypoints, and segmentations) according to
+        the given `scale_factor`. The annotations are modified in place to reflect
+        the new scale.
 
         Args:
             img (np.ndarray): The input image to be scaled.
-            anns (list[dict]): A list of annotations, each annotation being a dictionary that may contain:
+            anns (list[dict]): A list of annotations, each annotation being a dictionary
+                that may contain:
                 - "bbox" (list[float]): The bounding box coordinates [x, y, width, height].
                 - "dp_masks" (list[dict]): DensePose masks represented as dictionaries containing:
                     - "size" (list[int]): The size of the mask [height, width].
                     - "counts" (str or list[int]): RLE-encoded mask or binary mask counts.
                 - "area" (float): The area of the annotated region.
-                - "keypoints" (list[float]): Keypoint coordinates and visibility flags [x1, y1, v1, x2, y2, v2, ...].
+                - "keypoints" (list[float]): Keypoint coordinates and visibility flags
+                    [x1, y1, v1, x2, y2, v2, ...].
                 - "segmentation" (list[list[float]]): Segmentation polygon coordinates.
             scale_factor (float): The factor by which to scale the image and annotations.
-            resize_image_method (str, optional): The interpolation method to use when resizing the image.
-                Defaults to "bicubic". Available methods should be present in the `RESIZE_METHODS` dictionary.
+            resize_image_method (str, optional): The interpolation method to use when
+                resizing the image. Defaults to "bicubic". Available methods should
+                be present in the `RESIZE_METHODS` dictionary.
 
         Returns:
             tuple:
                 - np.ndarray: The scaled image.
-                - list[dict]: The scaled annotations with updated bounding boxes, masks, keypoints, segmentations,
-                and area.
-
-        Notes:
-            - The function assumes that the `RESIZE_METHODS` dictionary contains the appropriate resizing functions.
-            - Annotations are modified in place and returned with the scaled image.
-            - The scaling of masks is performed using nearest-neighbor interpolation to preserve mask integrity.
+                - list[dict]: The scaled annotations with updated bounding boxes, masks,
+                    keypoints, segmentations, and area.
         """
         img = RESIZE_METHODS.get(resize_image_method)(img, scale_factor)
         for ann in anns:
@@ -1025,14 +1070,11 @@ class COCODatasetDensePose(ResizableDataset):
 
         Args:
             image (np.ndarray): The input image to be displayed.
-            anns (list[dict]): A list of annotations associated with the image, containing DensePose data such as:
+            anns (list[dict]): A list of annotations associated with the image,
+                containing DensePose data such as:
                 - "dp_masks": DensePose masks for different body parts.
                 - "keypoints": Keypoints for different body regions.
                 - Other DensePose-specific annotations.
-
-        Notes:
-            - The visualization is handled by the function registered under `densepose` in `VISUALIZATION_REGISTRY`.
-            - The function shows the image non-blockingly and waits for a button press before closing the display.
         """
         img_with_annotations = image.copy()
         fig = VISUALIZATION_REGISTRY.densepose(img_with_annotations, anns)
@@ -1042,7 +1084,8 @@ class COCODatasetDensePose(ResizableDataset):
 
     def __getitem__(self, index):
         """
-        Retrieves and processes an image and its associated DensePose annotations based on the given index.
+        Retrieves and processes an image and its associated DensePose annotations
+        based on the given index.
 
         This function fetches an image and its corresponding annotations from the dataset,
         applies scaling or reshaping according to the configuration settings, and optionally
@@ -1054,7 +1097,8 @@ class COCODatasetDensePose(ResizableDataset):
         Returns:
             tuple:
                 - np.ndarray: The processed image.
-                - list[list[dict]]: A list containing a single list of annotations associated with the image.
+                - list[list[dict]]: A list containing a single list of annotations
+                    associated with the image.
 
         Workflow:
             1. Retrieves the image ID and its corresponding annotations.
@@ -1062,13 +1106,10 @@ class COCODatasetDensePose(ResizableDataset):
             3. Applies scaling or reshaping based on configuration:
                 - Scaling is applied if `self.cfg.image_shape` is `None`.
                 - Reshaping is applied if `self.cfg.image_shape` is specified.
-            4. If enabled in the configuration (`self.cfg.save`), saves the processed image and annotations.
-            5. If enabled in the configuration (`self.cfg.show`), displays the image with annotations.
-
-        Notes:
-            - The `self.cfg` object must contain the configuration settings for image scaling, reshaping,
-            and display options.
-            - The function assumes the existence of helper methods `scale`, `reshape`, `save`, and `show`.
+            4. If enabled in the configuration (`self.cfg.save`), saves the processed
+                image and annotations.
+            5. If enabled in the configuration (`self.cfg.show`), displays the image
+                with annotations.
         """
         img_id = self.ids[index]
         anns = self.annotations["imgToAnns"].get(img_id, [])
@@ -1101,8 +1142,9 @@ class COCODatasetDensePose(ResizableDataset):
         """
         Saves the processed image and its corresponding annotations.
 
-        This method saves the processed image to the specified output folder, updates the image's metadata,
-        and appends the metadata and annotations to the output annotations list.
+        This method saves the processed image to the specified output folder, updates
+        the image's metadata, and appends the metadata and annotations to the output
+        annotations list.
 
         Args:
             index (int): The index of the image in the dataset, used to retrieve the image ID.
@@ -1148,13 +1190,15 @@ class COCODatasetCaption(ResizableDataset):
         captions (dict): Mapping from image ID to a list of captions.
 
     Methods:
-        scale(img, scale_factor, resize_image_method="bicubic"): Scales the image by the given scale factor.
+        scale(img, scale_factor, resize_image_method="bicubic"): Scales the image
+            by the given scale factor.
         show(image, caption): Displays the image with its corresponding caption.
         __getitem__(index): Retrieves the image and caption for the given index.
         __len__(): Returns the total number of images in the dataset.
 
     Private Methods:
-        _create_annotations(annotations_path): Initializes the annotations from the COCO format JSON file.
+        _create_annotations(annotations_path): Initializes the annotations from the
+            COCO format JSON file.
     """
 
     def __init__(self, images_path, annotations_path, cfg):
@@ -1205,11 +1249,11 @@ class COCODatasetCaption(ResizableDataset):
             img_path = str(Path(self.images_folder) / img_data["file_name"])
             if not os.path.exists(img_path):
                 LOGGER.info(
-                    f"Can't open filepath {img_path}, it could not exist or be corrupted."
+                    "Can't open filepath %s, it could not exist or be corrupted.",
+                    img_path,
                 )
                 continue
-            else:
-                valid_ids.append(img_id)
+            valid_ids.append(img_id)
         return valid_ids
 
     def _filter_valid_annotations(self):
@@ -1217,19 +1261,16 @@ class COCODatasetCaption(ResizableDataset):
         Updates annotations to include only those related to valid images.
         """
         valid_img_ids = set(self.ids)
-
         self.annotations["imgs"] = {
             img_id: img
             for img_id, img in self.annotations["imgs"].items()
             if img_id in valid_img_ids
         }
-
         self.annotations["anns"] = {
             ann_id: ann
             for ann_id, ann in self.annotations["anns"].items()
             if ann["image_id"] in valid_img_ids
         }
-
         self.annotations["imgToAnns"] = {
             img_id: anns
             for img_id, anns in self.annotations["imgToAnns"].items()
@@ -1245,7 +1286,8 @@ class COCODatasetCaption(ResizableDataset):
         Args:
             img (np.ndarray): The input image to be resized.
             scale_factor (float): The factor by which to scale the image.
-            resize_image_method (str, optional): The method to use for resizing the image (default is "bicubic").
+            resize_image_method (str, optional): The method to use for resizing the
+                image (default is "bicubic").
 
         Returns:
             np.ndarray: The resized image (np.ndarray).
@@ -1378,8 +1420,8 @@ class COCODatasetCaption(ResizableDataset):
 @COCO_TASKS.register(name="keypoint")
 class COCODatasetKeypoint(ResizableDataset):
     """
-    A dataset class for handling COCO-format keypoint annotations, supporting image scaling, annotation filtering,
-    and image loading operations.
+    A dataset class for handling COCO-format keypoint annotations, supporting
+    image scaling, annotation filtering, and image loading operations.
 
     Attributes:
         cfg (ConfigDict): Configuration dictionary containing paths and settings.
@@ -1394,12 +1436,18 @@ class COCODatasetKeypoint(ResizableDataset):
         output_annotations (dict): Dictionary containing the output annotations.
 
     Methods:
-        __init__(images_path, annotations_path, cfg): Initializes the dataset with image paths, annotations, and configuration.
-        _create_annotations(annotations_path): Creates and initializes keypoint annotations from a JSON file.
-        _filter_valid_images(): Checks which images can be successfully loaded and returns a list of valid image IDs.
-        _filter_valid_annotations(): Updates annotations to include only those related to valid images.
-        scale(img, anns, scale_factor, resize_image_method="bicubic"): Scales the image and its keypoint annotations.
-        save(index, image, anns): Saves the processed image and annotations to the specified output folder.
+        __init__(images_path, annotations_path, cfg): Initializes the dataset with image
+            paths, annotations, and configuration.
+        _create_annotations(annotations_path): Creates and initializes keypoint annotations
+            from a JSON file.
+        _filter_valid_images(): Checks which images can be successfully loaded and returns
+            a list of valid image IDs.
+        _filter_valid_annotations(): Updates annotations to include only those related
+            to valid images.
+        scale(img, anns, scale_factor, resize_image_method="bicubic"): Scales the image
+            and its keypoint annotations.
+        save(index, image, anns): Saves the processed image and annotations to the
+            specified output folder.
         show(image, anns): Displays the image with keypoint annotations.
         __getitem__(index): Retrieves and processes an image and its annotations by index.
         __len__(): Returns the number of valid images in the dataset.
@@ -1407,14 +1455,6 @@ class COCODatasetKeypoint(ResizableDataset):
     """
 
     def __init__(self, images_path, annotations_path, cfg):
-        """
-        Initializes the COCODatasetKeypoint with image paths, annotations, and configuration.
-
-        Args:
-            images_path (str): Path to the folder containing images.
-            annotations_path (str): Path to the JSON file containing annotations.
-            cfg (ConfigDict): Configuration dictionary containing paths and settings.
-        """
         self.cfg = cfg
         self.images_folder = images_path
         self._create_annotations(annotations_path)
@@ -1425,7 +1465,6 @@ class COCODatasetKeypoint(ResizableDataset):
         self.name2id = {v: k for k, v in self.id2name.items()}
         self.id2color = generate_n_unique_colors(self.id2name.keys())
         self.id2cat = self.annotations.cats
-
         # To save
         self.images_output_folder = self.cfg.images_output_path
         self.labels_output_path = self.cfg.labels_output_path
@@ -1466,7 +1505,6 @@ class COCODatasetKeypoint(ResizableDataset):
         if "categories" in self.annotations.dataset:
             for cat in self.annotations.dataset["categories"]:
                 self.annotations["cats"][cat["id"]] = cat
-
         # Populate category to images mapping
         for ann in self.annotations["anns"].values():
             cat_id = ann["category_id"]
@@ -1487,11 +1525,11 @@ class COCODatasetKeypoint(ResizableDataset):
             img_path = str(Path(self.images_folder) / img_data["file_name"])
             if not os.path.exists(img_path):
                 LOGGER.info(
-                    f"Can't open filepath {img_path}, it could not exist or be corrupted."
+                    "Can't open filepath %s, it could not exist or be corrupted.",
+                    img_path,
                 )
                 continue
-            else:
-                valid_ids.append(img_id)
+            valid_ids.append(img_id)
         return valid_ids
 
     def _filter_valid_annotations(self):
@@ -1499,19 +1537,16 @@ class COCODatasetKeypoint(ResizableDataset):
         Updates annotations to include only those related to valid images.
         """
         valid_img_ids = set(self.ids)
-
         self.annotations["imgs"] = {
             img_id: img
             for img_id, img in self.annotations["imgs"].items()
             if img_id in valid_img_ids
         }
-
         self.annotations["anns"] = {
             ann_id: ann
             for ann_id, ann in self.annotations["anns"].items()
             if ann["image_id"] in valid_img_ids
         }
-
         self.annotations["imgToAnns"] = {
             img_id: anns
             for img_id, anns in self.annotations["imgToAnns"].items()
@@ -1523,7 +1558,7 @@ class COCODatasetKeypoint(ResizableDataset):
         Scales the image and its keypoint annotations.
 
         Args:
-            img (ndarray): The image to be scaled.
+            img (np.ndarray): The image to be scaled.
             anns (list): List of annotations associated with the image.
             scale_factor (float): Factor by which to scale the image and keypoints.
             resize_image_method (str): Method used to resize the image. Defaults to "bicubic".
@@ -1623,7 +1658,7 @@ class COCODatasetKeypoint(ResizableDataset):
         Displays the image with keypoint annotations.
 
         Args:
-            image (ndarray): Image to be displayed.
+            image (np.ndarray): Image to be displayed.
             anns (list): List of annotations to be displayed on the image.
         """
         img_with_annotations = image.copy()
