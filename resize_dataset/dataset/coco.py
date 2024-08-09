@@ -834,7 +834,9 @@ class COCODatasetDensePose(ResizableDataset):
         for img_id, img_data in self.annotations["imgs"].items():
             img_path = str(Path(self.images_folder) / img_data["file_name"])
             if not os.path.exists(img_path):
-                LOGGER.info(f"Can't open filepath {img_path}, it could not exist or be corrupted.")
+                LOGGER.info(
+                    f"Can't open filepath {img_path}, it could not exist or be corrupted."
+                )
                 continue
             else:
                 valid_ids.append(img_id)
@@ -845,16 +847,28 @@ class COCODatasetDensePose(ResizableDataset):
         Updates annotations to include only those related to valid images.
         """
         valid_img_ids = set(self.ids)
-        self.annotations["imgs"] = {img_id: img for img_id, img in self.annotations["imgs"].items() if img_id in valid_img_ids}
-        self.annotations["anns"] = {ann_id: ann for ann_id, ann in self.annotations["anns"].items() if ann["image_id"] in valid_img_ids}
-        self.annotations["imgToAnns"] = {img_id: anns for img_id, anns in self.annotations["imgToAnns"].items() if img_id in valid_img_ids}
+        self.annotations["imgs"] = {
+            img_id: img
+            for img_id, img in self.annotations["imgs"].items()
+            if img_id in valid_img_ids
+        }
+        self.annotations["anns"] = {
+            ann_id: ann
+            for ann_id, ann in self.annotations["anns"].items()
+            if ann["image_id"] in valid_img_ids
+        }
+        self.annotations["imgToAnns"] = {
+            img_id: anns
+            for img_id, anns in self.annotations["imgToAnns"].items()
+            if img_id in valid_img_ids
+        }
 
     def scale(self, img, anns, scale_factor, resize_image_method="bicubic"):
         """
         Scales an image and its associated DensePose annotations by a specified factor.
 
-        This function rescales the input image and adjusts the DensePose annotations (including bounding boxes, masks, 
-        keypoints, and segmentations) according to the given `scale_factor`. The annotations are modified in place 
+        This function rescales the input image and adjusts the DensePose annotations (including bounding boxes, masks,
+        keypoints, and segmentations) according to the given `scale_factor`. The annotations are modified in place
         to reflect the new scale.
 
         Args:
@@ -868,13 +882,13 @@ class COCODatasetDensePose(ResizableDataset):
                 - "keypoints" (list[float]): Keypoint coordinates and visibility flags [x1, y1, v1, x2, y2, v2, ...].
                 - "segmentation" (list[list[float]]): Segmentation polygon coordinates.
             scale_factor (float): The factor by which to scale the image and annotations.
-            resize_image_method (str, optional): The interpolation method to use when resizing the image. 
+            resize_image_method (str, optional): The interpolation method to use when resizing the image.
                 Defaults to "bicubic". Available methods should be present in the `RESIZE_METHODS` dictionary.
 
         Returns:
-            tuple: 
+            tuple:
                 - np.ndarray: The scaled image.
-                - list[dict]: The scaled annotations with updated bounding boxes, masks, keypoints, segmentations, 
+                - list[dict]: The scaled annotations with updated bounding boxes, masks, keypoints, segmentations,
                 and area.
 
         Notes:
@@ -891,7 +905,7 @@ class COCODatasetDensePose(ResizableDataset):
                 for idx, dp_mask in enumerate(ann["dp_masks"]):
                     if isinstance(dp_mask, dict):
                         h, w = dp_mask["size"]
-                        if isinstance(dp_mask['counts'], str):
+                        if isinstance(dp_mask["counts"], str):
                             mask = mask_utils.decode(dp_mask)
                         else:
                             mask = rle_to_mask(dp_mask["counts"], h, w, order="F")
@@ -900,7 +914,7 @@ class COCODatasetDensePose(ResizableDataset):
                             (w * scale_factor, h * scale_factor),
                             interpolation=cv2.INTER_NEAREST,
                         ).astype(np.uint8)
-                        if isinstance(dp_mask['counts'], str):
+                        if isinstance(dp_mask["counts"], str):
                             ann["dp_masks"][idx]["counts"] = binary_mask_to_rle_coded(
                                 resized_mask
                             )
@@ -910,21 +924,25 @@ class COCODatasetDensePose(ResizableDataset):
                             )
                         ann["dp_masks"][idx]["size"] = [
                             h * scale_factor,
-                            w * scale_factor,]
-            ann["area"] = ann["area"] * (scale_factor ** 2)
+                            w * scale_factor,
+                        ]
+            ann["area"] = ann["area"] * (scale_factor**2)
             if "keypoints" in ann:
                 keypoints = ann["keypoints"]
                 scaled_keypoints = []
                 for i in range(0, len(keypoints), 3):
                     x = keypoints[i] * scale_factor
                     y = keypoints[i + 1] * scale_factor
-                    v = keypoints[i + 2]  
+                    v = keypoints[i + 2]
                     scaled_keypoints.extend([x, y, v])
                 ann["keypoints"] = scaled_keypoints
             if "segmentation" in ann:
-                ann['segmentation'] = [[coord * scale_factor for coord in segment] for segment in ann['segmentation']]
+                ann["segmentation"] = [
+                    [coord * scale_factor for coord in segment]
+                    for segment in ann["segmentation"]
+                ]
         return img, anns
-    
+
     def reshape(self, img, anns, shape, resize_image_method="bicubic"):
         """
         Reshapes an image and its corresponding annotations to a specified size.
@@ -959,14 +977,14 @@ class COCODatasetDensePose(ResizableDataset):
                 for idx, dp_mask in enumerate(ann["dp_masks"]):
                     if isinstance(dp_mask, dict):
                         h, w = dp_mask["size"]
-                        if isinstance(dp_mask['counts'], str):
+                        if isinstance(dp_mask["counts"], str):
                             mask = mask_utils.decode(dp_mask)
                         else:
                             mask = rle_to_mask(dp_mask["counts"], h, w, order="F")
                         resized_mask = cv2.resize(
-                        mask, shape, interpolation=cv2.INTER_NEAREST
+                            mask, shape, interpolation=cv2.INTER_NEAREST
                         ).astype(np.uint8)
-                        if isinstance(dp_mask['counts'], str):
+                        if isinstance(dp_mask["counts"], str):
                             ann["dp_masks"][idx]["counts"] = binary_mask_to_rle_coded(
                                 resized_mask
                             )
@@ -976,7 +994,8 @@ class COCODatasetDensePose(ResizableDataset):
                             )
                         ann["dp_masks"][idx]["size"] = [
                             h * yf,
-                            w * xf,]
+                            w * xf,
+                        ]
             ann["area"] *= xf * yf
             if "keypoints" in ann:
                 keypoints = ann["keypoints"]
@@ -984,24 +1003,24 @@ class COCODatasetDensePose(ResizableDataset):
                 for i in range(0, len(keypoints), 3):
                     x = keypoints[i] * xf
                     y = keypoints[i + 1] * yf
-                    v = keypoints[i + 2]  
+                    v = keypoints[i + 2]
                     scaled_keypoints.extend([x, y, v])
                 ann["keypoints"] = scaled_keypoints
             if "segmentation" in ann:
-                if isinstance(ann["segmentation"], list): 
+                if isinstance(ann["segmentation"], list):
                     for i, polygon in enumerate(ann["segmentation"]):
                         ann["segmentation"][i] = [
                             c * xf if i % 2 == 0 else c * yf
                             for i, c in enumerate(polygon)
                         ]
         return img, anns
-    
+
     def show(self, image, anns):
         """
         Displays an image with its associated DensePose annotations.
 
-        This function overlays the DensePose annotations onto a copy of the input image and 
-        visualizes it using the appropriate visualization method from the `VISUALIZATION_REGISTRY`. 
+        This function overlays the DensePose annotations onto a copy of the input image and
+        visualizes it using the appropriate visualization method from the `VISUALIZATION_REGISTRY`.
         The displayed image includes features such as DensePose coordinates.
 
         Args:
@@ -1017,26 +1036,26 @@ class COCODatasetDensePose(ResizableDataset):
         """
         img_with_annotations = image.copy()
         fig = VISUALIZATION_REGISTRY.densepose(img_with_annotations, anns)
-        plt.show(block=False) 
-        plt.waitforbuttonpress()  
+        plt.show(block=False)
+        plt.waitforbuttonpress()
         plt.close(fig)
 
     def __getitem__(self, index):
         """
         Retrieves and processes an image and its associated DensePose annotations based on the given index.
 
-        This function fetches an image and its corresponding annotations from the dataset, 
-        applies scaling or reshaping according to the configuration settings, and optionally 
+        This function fetches an image and its corresponding annotations from the dataset,
+        applies scaling or reshaping according to the configuration settings, and optionally
         saves or displays the processed image and annotations.
 
         Args:
             index (int): The index of the image and annotations to retrieve.
 
         Returns:
-            tuple: 
+            tuple:
                 - np.ndarray: The processed image.
                 - list[list[dict]]: A list containing a single list of annotations associated with the image.
-            
+
         Workflow:
             1. Retrieves the image ID and its corresponding annotations.
             2. Loads the image from the specified path.
@@ -1045,9 +1064,9 @@ class COCODatasetDensePose(ResizableDataset):
                 - Reshaping is applied if `self.cfg.image_shape` is specified.
             4. If enabled in the configuration (`self.cfg.save`), saves the processed image and annotations.
             5. If enabled in the configuration (`self.cfg.show`), displays the image with annotations.
-        
+
         Notes:
-            - The `self.cfg` object must contain the configuration settings for image scaling, reshaping, 
+            - The `self.cfg` object must contain the configuration settings for image scaling, reshaping,
             and display options.
             - The function assumes the existence of helper methods `scale`, `reshape`, `save`, and `show`.
         """
@@ -1099,7 +1118,6 @@ class COCODatasetDensePose(ResizableDataset):
         img_ann["height"], img_ann["width"] = image.shape[:2]
         self.output_annotations["annotations"].append(anns)
         self.output_annotations["images"].append(img_ann)
-        
 
     def close(self):
         """
@@ -1186,7 +1204,9 @@ class COCODatasetCaption(ResizableDataset):
         for img_id, img_data in self.annotations["imgs"].items():
             img_path = str(Path(self.images_folder) / img_data["file_name"])
             if not os.path.exists(img_path):
-                LOGGER.info(f"Can't open filepath {img_path}, it could not exist or be corrupted.")
+                LOGGER.info(
+                    f"Can't open filepath {img_path}, it could not exist or be corrupted."
+                )
                 continue
             else:
                 valid_ids.append(img_id)
@@ -1231,7 +1251,7 @@ class COCODatasetCaption(ResizableDataset):
             np.ndarray: The resized image (np.ndarray).
         """
         return RESIZE_METHODS.get(resize_image_method)(img, scale_factor), anns
-    
+
     def reshape(self, img, anns, shape, resize_image_method="bicubic"):
         """
         Reshapes an image and its corresponding annotations to a specified size.
@@ -1254,7 +1274,6 @@ class COCODatasetCaption(ResizableDataset):
             annotations (list[dict]).
         """
         return RESIZE_METHODS.get(resize_image_method)(img, shape), anns
-        
 
     def show(self, image, anns):
         """
@@ -1467,7 +1486,9 @@ class COCODatasetKeypoint(ResizableDataset):
         for img_id, img_data in self.annotations["imgs"].items():
             img_path = str(Path(self.images_folder) / img_data["file_name"])
             if not os.path.exists(img_path):
-                LOGGER.info(f"Can't open filepath {img_path}, it could not exist or be corrupted.")
+                LOGGER.info(
+                    f"Can't open filepath {img_path}, it could not exist or be corrupted."
+                )
                 continue
             else:
                 valid_ids.append(img_id)
@@ -1515,9 +1536,12 @@ class COCODatasetKeypoint(ResizableDataset):
             if "bbox" in ann:
                 bbox = ann["bbox"]
                 ann["bbox"] = [coord * scale_factor for coord in bbox]
-            ann["area"] = ann["area"] * (scale_factor ** 2)
+            ann["area"] = ann["area"] * (scale_factor**2)
             if "segmentation" in ann:
-                ann['segmentation'] = [[coord * scale_factor for coord in segment] for segment in ann['segmentation']]
+                ann["segmentation"] = [
+                    [coord * scale_factor for coord in segment]
+                    for segment in ann["segmentation"]
+                ]
             if "keypoints" in ann:
                 keypoints = ann["keypoints"]
                 scaled_keypoints = []
@@ -1528,7 +1552,7 @@ class COCODatasetKeypoint(ResizableDataset):
                     scaled_keypoints.extend([x, y, v])
                 ann["keypoints"] = scaled_keypoints
         return img, anns
-    
+
     def reshape(self, img, anns, shape, resize_image_method="bicubic"):
         """
         Reshapes an image and its corresponding annotations to a specified size.
@@ -1560,17 +1584,17 @@ class COCODatasetKeypoint(ResizableDataset):
                 x1, y1, w, h = ann["bbox"]
                 ann["bbox"] = [x1 * xf, y1 * yf, w * xf, h * yf]
             if "keypoints" in ann:
-                    keypoints = ann["keypoints"]
-                    scaled_keypoints = []
-                    for i in range(0, len(keypoints), 3):
-                        x = keypoints[i] * xf
-                        y = keypoints[i + 1] * yf
-                        v = keypoints[i + 2]  
-                        scaled_keypoints.extend([x, y, v])
-                    ann["keypoints"] = scaled_keypoints
+                keypoints = ann["keypoints"]
+                scaled_keypoints = []
+                for i in range(0, len(keypoints), 3):
+                    x = keypoints[i] * xf
+                    y = keypoints[i + 1] * yf
+                    v = keypoints[i + 2]
+                    scaled_keypoints.extend([x, y, v])
+                ann["keypoints"] = scaled_keypoints
             ann["area"] *= xf * yf
             if "segmentation" in ann:
-                if isinstance(ann["segmentation"], list): 
+                if isinstance(ann["segmentation"], list):
                     for i, polygon in enumerate(ann["segmentation"]):
                         ann["segmentation"][i] = [
                             c * xf if i % 2 == 0 else c * yf
