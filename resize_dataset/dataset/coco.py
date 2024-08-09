@@ -1,9 +1,9 @@
+import os
 from pathlib import Path
 import cv2
 import matplotlib.pyplot as plt
 import torch
 import numpy as np
-import os
 import pycocotools.mask as mask_utils
 from pycocotools import _mask as coco_mask
 from resize_dataset.image import RESIZE_METHODS
@@ -128,7 +128,7 @@ class COCODataset(ResizableDataset):
         self.output_annotations["annotations"] = []
         self.output_annotations["images"] = []
         if self.cfg.save:
-            ensure_folder_exist(Path(self.images_output_folder))
+            ensure_folder_exist(self.images_output_folder)
 
     def _create_annotations(self, annotations_path):
         """
@@ -510,7 +510,7 @@ class COCODatasetPanoptic(ResizableDataset):
         self.output_annotations["annotations"] = []
         self.output_annotations["images"] = []
         if self.cfg.save:
-            ensure_folder_exist(Path(self.images_output_folder))
+            ensure_folder_exist(self.images_output_folder)
 
     def _create_annotations(self, annotations_path):
         """
@@ -674,7 +674,7 @@ class COCODatasetPanoptic(ResizableDataset):
         """
         annotation, scaled_mask = anns
         img_with_annotations = image.copy()
-        seg_img = scaled_mask[0].cpu().numpy().astype(np.uint32)
+        seg_img = scaled_mask.astype(np.uint32)
         ids = seg_img[:, :, 2] + seg_img[:, :, 1] * 256 + seg_img[:, :, 0] * 256**2
         for seg_info in annotation["segments_info"]:
             idx = (
@@ -783,7 +783,7 @@ class COCODatasetDensePose(ResizableDataset):
         self.output_annotations["annotations"] = []
         self.output_annotations["images"] = []
         if self.cfg.save:
-            ensure_folder_exist(Path(self.images_output_folder))
+            ensure_folder_exist(self.images_output_folder)
 
     def _create_annotations(self, annotations_path):
         """
@@ -1169,7 +1169,7 @@ class COCODatasetCaption(ResizableDataset):
         self.output_annotations["annotations"] = []
         self.output_annotations["images"] = []
         if self.cfg.save:
-            ensure_folder_exist(Path(self.images_output_folder))
+            ensure_folder_exist(self.images_output_folder)
 
     def _create_annotations(self, annotations_path):
         self.annotations = ConfigDict()
@@ -1434,7 +1434,7 @@ class COCODatasetKeypoint(ResizableDataset):
         self.output_annotations["annotations"] = []
         self.output_annotations["images"] = []
         if self.cfg.save:
-            ensure_folder_exist(Path(self.images_output_folder))
+            ensure_folder_exist(self.images_output_folder)
 
     def _create_annotations(self, annotations_path):
         """
