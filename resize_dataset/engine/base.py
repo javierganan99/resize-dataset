@@ -1,6 +1,10 @@
 from tqdm import tqdm
-from torch.utils.data import DataLoader
-from resize_dataset.utils import DEFAULT_CFG, colorstr, ConfigDict
+from resize_dataset.utils import (
+    DEFAULT_CFG,
+    colorstr,
+    ConfigDict,
+    TQDM_BAR_FORMAT_GREEN,
+)
 from resize_dataset.dataset import DATASET_REGISTRY
 
 
@@ -67,12 +71,14 @@ class ResizeDataset:
         Returns:
             None: This function does not return any value.
         """
-        dataloader = DataLoader(self.dataset, batch_size=1, shuffle=False)
-        for image, annotations in tqdm(
-            dataloader, desc=colorstr("📏 Scaling dataset"), total=len(dataloader)
+        for _, _ in tqdm(
+            self.dataset,
+            desc=colorstr("📏 Scaling dataset"),
+            total=len(self.dataset),
+            bar_format=TQDM_BAR_FORMAT_GREEN,
+            colour="green",
         ):
-            if self.cfg.show:
-                self.dataset.show(image[0].numpy(), annotations[0])
+            pass
         self.dataset.close()
 
     @property

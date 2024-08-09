@@ -15,7 +15,7 @@ jobs:
     - name: Check PR description for mandatory content
       run: |
         PR_BODY=$(jq -r .pull_request.body < $GITHUB_EVENT_PATH)
-        MANDATORY_SECTIONS=("Summary" "Description")
+        MANDATORY_SECTIONS=("Summary" "Description" "How to test")
         
         for SECTION in "${MANDATORY_SECTIONS[@]}"; do
           if [[ "$PR_BODY" != *"$SECTION"* ]]; then
