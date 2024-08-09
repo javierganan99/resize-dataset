@@ -71,7 +71,6 @@ class ResizeDataset:
         Returns:
             None: This function does not return any value.
         """
-        i = 0
         for _, _ in tqdm(
             self.dataset,
             desc=colorstr("📏 Scaling dataset"),
