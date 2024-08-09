@@ -1272,8 +1272,8 @@ class COCODatasetCaption(ResizableDataset):
         """
         img_with_caption = image.copy()
         for ann in anns:
-            cv2.namedWindow(f"Caption: {ann["caption"]}", cv2.WINDOW_NORMAL)
-            cv2.imshow(f"Caption: {ann["caption"]}", img_with_caption)
+            cv2.namedWindow(f"Caption: {ann['caption']}", cv2.WINDOW_NORMAL)
+            cv2.imshow(f"Caption: {ann['caption']}", img_with_caption)
             cv2.waitKey(0)
 
     def __getitem__(self, index):

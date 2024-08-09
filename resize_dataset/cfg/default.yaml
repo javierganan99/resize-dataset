@@ -1,11 +1,11 @@
 dataset_format: "coco"
-dataset_task: "densepose"
+dataset_task: "panoptic"
 task: scale
 scale_factor: 4
-image_shape: null # or [H,W]
+image_shape: null # or [W,H]
 resize_image_method: "bicubic"
 resize_mask_method: "nearest"
-show: True
+show: False
 save: False
 images_path: "/home/fjganan/GitHub/datasets/coco_dataset/val2017"
 labels_path: "/home/fjganan/GitHub/datasets/coco_dataset/panoptic_val2017.json"
