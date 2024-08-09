@@ -1,10 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import base64
-import zlib
 from resize_dataset.utils import ConfigDict
-import pycocotools.mask as mask_util
 
 
 def add_bounding_box(
@@ -240,7 +237,6 @@ def add_dense_poses(image, anns):
     fig, axs = plt.subplots(1, 3, figsize=[15, 5])
 
     extent = [0, image.shape[1], image.shape[0], 0]
-
     axs[0].imshow(image, extent=extent)
     axs[0].axis("off")
     axs[0].set_title("Patch Indices")
@@ -275,17 +271,6 @@ def add_dense_poses(image, anns):
             plt.scatter(Point_x, Point_y, 22, Point_U)
             plt.subplot(1, 3, 3)
             plt.scatter(Point_x, Point_y, 22, Point_V)
-            for ax in axs:
-                ax.add_patch(
-                    plt.Rectangle(
-                        (x1, y1),
-                        bbr[2],
-                        bbr[3],
-                        fill=False,
-                        edgecolor="red",
-                        linewidth=2,
-                    )
-                )
     for ax in axs:
         ax.set_aspect("equal")
 

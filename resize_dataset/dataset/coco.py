@@ -1,5 +1,3 @@
-import base64
-import zlib
 from pathlib import Path
 import cv2
 import matplotlib.pyplot as plt
@@ -129,6 +127,8 @@ class COCODataset(ResizableDataset):
         self.output_annotations = self.annotations.dataset
         self.output_annotations["annotations"] = []
         self.output_annotations["images"] = []
+        if self.cfg.save:
+            ensure_folder_exist(Path(self.images_output_folder))
 
     def _create_annotations(self, annotations_path):
         """
@@ -410,7 +410,9 @@ class COCODataset(ResizableDataset):
         )
         if self.cfg.save:
             self.save(index, img, anns)
-        return img, [anns]
+        if self.cfg.show:
+            self.show(img, anns)
+        return img, anns
 
     def __len__(self):
         """
@@ -507,6 +509,8 @@ class COCODatasetPanoptic(ResizableDataset):
         self.output_annotations = self.annotations.dataset
         self.output_annotations["annotations"] = []
         self.output_annotations["images"] = []
+        if self.cfg.save:
+            ensure_folder_exist(Path(self.images_output_folder))
 
     def _create_annotations(self, annotations_path):
         """
@@ -727,7 +731,9 @@ class COCODatasetPanoptic(ResizableDataset):
         )
         if self.cfg.save:
             self.save(index, img, anns)
-        return img, [anns]
+        if self.cfg.show:
+            self.show(img, anns)
+        return img, anns
 
     def __len__(self):
         """
@@ -767,27 +773,58 @@ class COCODatasetDensePose(ResizableDataset):
         self._create_annotations(annotations_path)
         self.ids = self._filter_valid_images()
         self._filter_valid_annotations()  # New method to filter annotations
-        self.id2name = {cat['id']: cat['name'] for cat in self.annotations["categories"]}
-        self.name2id = {name: id_ for id_, name in self.id2name.items()}
+        self.ids = list(sorted(self.annotations.imgs.keys()))
+        self.id2name = {k: v["name"] for k, v in self.annotations.cats.items()}
+        self.name2id = {v: k for k, v in self.id2name.items()}
         self.id2color = generate_n_unique_colors(self.id2name.keys())
         self.images_output_folder = self.cfg.images_output_path
         self.labels_output_path = self.cfg.labels_output_path
-        self.output_annotations = {"images": [], "annotations": []}
+        self.output_annotations = self.annotations.dataset
+        self.output_annotations["annotations"] = []
+        self.output_annotations["images"] = []
+        if self.cfg.save:
+            ensure_folder_exist(Path(self.images_output_folder))
 
     def _create_annotations(self, annotations_path):
         """
-        Creates and organizes DensePose annotations from a specified JSON file.
+        Creates and organizes annotations from a specified JSON file.
+
+        This function loads annotations from a given path and structures them into
+        a dictionary-like object. It organizes the annotations by mapping image IDs
+        to their corresponding annotations, as well as organizing categories and
+        images. The resulting structure is stored in the `annotations` attribute
+        of the class.
+
+        Args:
+            annotations_path (str): The file path to the JSON annotations file.
+
+        Returns:
+            None: This function does not return a value. It modifies the
+            annotations attribute of the class instance in place.
         """
-        self.annotations = load_json(annotations_path)
-        self.annotations["anns"] = {ann["id"]: ann for ann in self.annotations["annotations"]}
-        self.annotations["cats"] = {cat["id"]: cat for cat in self.annotations["categories"]}
-        self.annotations["imgs"] = {img["id"]: img for img in self.annotations["images"]}
-        self.annotations["imgToAnns"] = {}
-        for ann in self.annotations["annotations"]:
-            img_id = ann["image_id"]
-            if img_id not in self.annotations["imgToAnns"]:
-                self.annotations["imgToAnns"][img_id] = []
-            self.annotations["imgToAnns"][img_id].append(ann)
+        self.annotations = ConfigDict()
+        self.annotations["dataset"] = load_json(annotations_path)
+        self.annotations["anns"], self.annotations["cats"], self.annotations["imgs"] = (
+            {},
+            {},
+            {},
+        )
+        self.annotations["imgToAnns"], self.annotations["catToImgs"] = (
+            ConfigDict(),
+            ConfigDict(),
+        )
+        if "annotations" in self.annotations.dataset:
+            for ann in self.annotations.dataset["annotations"]:
+                if ann["image_id"] not in self.annotations.imgToAnns:
+                    self.annotations.imgToAnns[ann["image_id"]] = []
+                self.annotations.imgToAnns[ann["image_id"]].append(ann)
+                self.annotations["anns"][ann["id"]] = ann
+        if "images" in self.annotations.dataset:
+            for img in self.annotations.dataset["images"]:
+                self.annotations["imgs"][img["id"]] = img
+        if "categories" in self.annotations.dataset:
+            for cat in self.annotations.dataset["categories"]:
+                self.annotations["cats"][cat["id"]] = cat
 
     def _filter_valid_images(self):
         """
@@ -814,15 +851,43 @@ class COCODatasetDensePose(ResizableDataset):
 
     def scale(self, img, anns, scale_factor, resize_image_method="bicubic"):
         """
-        Scales DensePose annotations by a specified factor.
+        Scales an image and its associated DensePose annotations by a specified factor.
+
+        This function rescales the input image and adjusts the DensePose annotations (including bounding boxes, masks, 
+        keypoints, and segmentations) according to the given `scale_factor`. The annotations are modified in place 
+        to reflect the new scale.
+
+        Args:
+            img (np.ndarray): The input image to be scaled.
+            anns (list[dict]): A list of annotations, each annotation being a dictionary that may contain:
+                - "bbox" (list[float]): The bounding box coordinates [x, y, width, height].
+                - "dp_masks" (list[dict]): DensePose masks represented as dictionaries containing:
+                    - "size" (list[int]): The size of the mask [height, width].
+                    - "counts" (str or list[int]): RLE-encoded mask or binary mask counts.
+                - "area" (float): The area of the annotated region.
+                - "keypoints" (list[float]): Keypoint coordinates and visibility flags [x1, y1, v1, x2, y2, v2, ...].
+                - "segmentation" (list[list[float]]): Segmentation polygon coordinates.
+            scale_factor (float): The factor by which to scale the image and annotations.
+            resize_image_method (str, optional): The interpolation method to use when resizing the image. 
+                Defaults to "bicubic". Available methods should be present in the `RESIZE_METHODS` dictionary.
+
+        Returns:
+            tuple: 
+                - np.ndarray: The scaled image.
+                - list[dict]: The scaled annotations with updated bounding boxes, masks, keypoints, segmentations, 
+                and area.
+
+        Notes:
+            - The function assumes that the `RESIZE_METHODS` dictionary contains the appropriate resizing functions.
+            - Annotations are modified in place and returned with the scaled image.
+            - The scaling of masks is performed using nearest-neighbor interpolation to preserve mask integrity.
         """
         img = RESIZE_METHODS.get(resize_image_method)(img, scale_factor)
-        # TODO: Check that the mask resizing is okey and include resizing of keypoints and segmentation fields
         for ann in anns:
-            print(f"Soy ann {ann}")
-            if "dp_masks" in ann:
+            if "bbox" in ann:
                 bbox = ann["bbox"]
                 ann["bbox"] = [coord * scale_factor for coord in bbox]
+            if "dp_masks" in ann:
                 for idx, dp_mask in enumerate(ann["dp_masks"]):
                     if isinstance(dp_mask, dict):
                         h, w = dp_mask["size"]
@@ -846,34 +911,166 @@ class COCODatasetDensePose(ResizableDataset):
                         ann["dp_masks"][idx]["size"] = [
                             h * scale_factor,
                             w * scale_factor,]
-            ann["area"] = ann["area"]
+            ann["area"] = ann["area"] * (scale_factor ** 2)
+            if "keypoints" in ann:
+                keypoints = ann["keypoints"]
+                scaled_keypoints = []
+                for i in range(0, len(keypoints), 3):
+                    x = keypoints[i] * scale_factor
+                    y = keypoints[i + 1] * scale_factor
+                    v = keypoints[i + 2]  
+                    scaled_keypoints.extend([x, y, v])
+                ann["keypoints"] = scaled_keypoints
+            if "segmentation" in ann:
+                ann['segmentation'] = [[coord * scale_factor for coord in segment] for segment in ann['segmentation']]
+        return img, anns
+    
+    def reshape(self, img, anns, shape, resize_image_method="bicubic"):
+        """
+        Reshapes an image and its corresponding annotations to a specified size.
+
+        This function resizes the input image and scales the bounding boxes,
+        segmentation and all annotations according to the new dimensions. It offers the
+        option to specify the method used for resizing the image.
+
+        Args:
+            img (np.ndarray): The input image to be resized.
+            anns (list[dict]): A list of annotations corresponding to the image,
+                each containing at least a "bbox" key and optionally "segmentation".
+            shape (tuple): The desired output shape of the image as (width, height).
+            resize_image_method (str, optional): The method used for resizing the
+                image, default is "bicubic". Other methods can be defined in
+                RESIZE_METHODS.
+
+        Returns:
+            tuple: A tuple containing the resized image (np.ndarray) and the updated
+            annotations (list[dict]).
+        """
+        h0, w0 = img.shape[:2]
+        wn, hn = shape
+        xf = wn / w0
+        yf = hn / h0
+        img = RESIZE_METHODS.get(resize_image_method)(img, shape)
+        for ann in anns:
+            if "bbox" in ann:
+                x1, y1, w, h = ann["bbox"]
+                ann["bbox"] = [x1 * xf, y1 * yf, w * xf, h * yf]
+            if "dp_masks" in ann:
+                for idx, dp_mask in enumerate(ann["dp_masks"]):
+                    if isinstance(dp_mask, dict):
+                        h, w = dp_mask["size"]
+                        if isinstance(dp_mask['counts'], str):
+                            mask = mask_utils.decode(dp_mask)
+                        else:
+                            mask = rle_to_mask(dp_mask["counts"], h, w, order="F")
+                        resized_mask = cv2.resize(
+                        mask, shape, interpolation=cv2.INTER_NEAREST
+                        ).astype(np.uint8)
+                        if isinstance(dp_mask['counts'], str):
+                            ann["dp_masks"][idx]["counts"] = binary_mask_to_rle_coded(
+                                resized_mask
+                            )
+                        else:
+                            ann["dp_masks"][idx]["counts"] = mask_to_rle(
+                                resized_mask, order="F"
+                            )
+                        ann["dp_masks"][idx]["size"] = [
+                            h * yf,
+                            w * xf,]
+            ann["area"] *= xf * yf
+            if "keypoints" in ann:
+                keypoints = ann["keypoints"]
+                scaled_keypoints = []
+                for i in range(0, len(keypoints), 3):
+                    x = keypoints[i] * xf
+                    y = keypoints[i + 1] * yf
+                    v = keypoints[i + 2]  
+                    scaled_keypoints.extend([x, y, v])
+                ann["keypoints"] = scaled_keypoints
+            if "segmentation" in ann:
+                if isinstance(ann["segmentation"], list): 
+                    for i, polygon in enumerate(ann["segmentation"]):
+                        ann["segmentation"][i] = [
+                            c * xf if i % 2 == 0 else c * yf
+                            for i, c in enumerate(polygon)
+                        ]
         return img, anns
     
     def show(self, image, anns):
         """
-        Displays an image with DensePose annotations such as DensePose coordinates.
+        Displays an image with its associated DensePose annotations.
+
+        This function overlays the DensePose annotations onto a copy of the input image and 
+        visualizes it using the appropriate visualization method from the `VISUALIZATION_REGISTRY`. 
+        The displayed image includes features such as DensePose coordinates.
+
+        Args:
+            image (np.ndarray): The input image to be displayed.
+            anns (list[dict]): A list of annotations associated with the image, containing DensePose data such as:
+                - "dp_masks": DensePose masks for different body parts.
+                - "keypoints": Keypoints for different body regions.
+                - Other DensePose-specific annotations.
+
+        Notes:
+            - The visualization is handled by the function registered under `densepose` in `VISUALIZATION_REGISTRY`.
+            - The function shows the image non-blockingly and waits for a button press before closing the display.
         """
         img_with_annotations = image.copy()
         fig = VISUALIZATION_REGISTRY.densepose(img_with_annotations, anns)
         plt.show(block=False) 
         plt.waitforbuttonpress()  
         plt.close(fig)
-        img_with_annotations = image.copy()
-        # TODO: Al guardar las anns mete en una lista el dp_mask["counts"] y hace todo con torch, cosa un poco rara, tambien hay que ver si las mascaras estan
-        # comprimidas y codificadas en base 64 o no en el original, debo modificar segmentation y keypoints y ya estaría
 
     def __getitem__(self, index):
         """
-        Retrieves an image and its associated DensePose annotations from the dataset based on the given index.
+        Retrieves and processes an image and its associated DensePose annotations based on the given index.
+
+        This function fetches an image and its corresponding annotations from the dataset, 
+        applies scaling or reshaping according to the configuration settings, and optionally 
+        saves or displays the processed image and annotations.
+
+        Args:
+            index (int): The index of the image and annotations to retrieve.
+
+        Returns:
+            tuple: 
+                - np.ndarray: The processed image.
+                - list[list[dict]]: A list containing a single list of annotations associated with the image.
+            
+        Workflow:
+            1. Retrieves the image ID and its corresponding annotations.
+            2. Loads the image from the specified path.
+            3. Applies scaling or reshaping based on configuration:
+                - Scaling is applied if `self.cfg.image_shape` is `None`.
+                - Reshaping is applied if `self.cfg.image_shape` is specified.
+            4. If enabled in the configuration (`self.cfg.save`), saves the processed image and annotations.
+            5. If enabled in the configuration (`self.cfg.show`), displays the image with annotations.
+        
+        Notes:
+            - The `self.cfg` object must contain the configuration settings for image scaling, reshaping, 
+            and display options.
+            - The function assumes the existence of helper methods `scale`, `reshape`, `save`, and `show`.
         """
         img_id = self.ids[index]
         anns = self.annotations["imgToAnns"].get(img_id, [])
         path = self.annotations["imgs"][img_id]["file_name"]
         img = cv2.imread(str(Path(self.images_folder) / path))
-        img, anns = self.scale(img, anns, scale_factor=self.cfg.scale_factor, resize_image_method=self.cfg.resize_image_method)
+        resize_function, resize_parameter = (
+            (self.scale, self.cfg.scale_factor)
+            if self.cfg.image_shape is None
+            else (self.reshape, self.cfg.image_shape)
+        )
+        img, anns = resize_function(
+            img,
+            anns,
+            resize_parameter,
+            resize_image_method=self.cfg.resize_image_method,
+        )
         if self.cfg.save:
             self.save(index, img, anns)
-        return img, [anns]
+        if self.cfg.show:
+            self.show(img, anns)
+        return img, anns
 
     def __len__(self):
         """
@@ -883,19 +1080,26 @@ class COCODatasetDensePose(ResizableDataset):
 
     def save(self, index, image, anns):
         """
-        Saves the processed image and annotations to the specified output folder.
+        Saves the processed image and its corresponding annotations.
+
+        This method saves the processed image to the specified output folder, updates the image's metadata,
+        and appends the metadata and annotations to the output annotations list.
+
+        Args:
+            index (int): The index of the image in the dataset, used to retrieve the image ID.
+            image (np.ndarray): The processed image to be saved.
+            anns (dict): The annotations associated with the image.
+
+        Returns:
+            None
         """
         img_id = self.ids[index]
-        image_name = self.annotations["imgs"][img_id]["file_name"]
-        cv2.imwrite(str(Path(self.images_output_folder) / image_name), image)
-        new_height, new_width = image.shape[:2]
-        self.annotations["imgs"][img_id]["height"] = new_height
-        self.annotations["imgs"][img_id]["width"] = new_width
-        for ann in anns:
-            if ann["id"] not in {a["id"] for a in self.output_annotations["annotations"]}:
-                self.output_annotations["annotations"].append(ann)
-        if img_id not in {img["id"] for img in self.output_annotations["images"]}:
-            self.output_annotations["images"].append(self.annotations["imgs"][img_id])
+        img_ann = self.annotations.imgs[img_id]
+        cv2.imwrite(str(Path(self.images_output_folder) / img_ann["file_name"]), image)
+        img_ann["height"], img_ann["width"] = image.shape[:2]
+        self.output_annotations["annotations"].append(anns)
+        self.output_annotations["images"].append(img_ann)
+        
 
     def close(self):
         """
@@ -904,7 +1108,7 @@ class COCODatasetDensePose(ResizableDataset):
         save_json(self.output_annotations, self.labels_output_path)
 
 
-@COCO_TASKS.register(name="captioning")
+@COCO_TASKS.register(name="caption")
 class COCODatasetCaption(ResizableDataset):
     """
     Dataset class for loading and processing images and captions in COCO format.
@@ -943,14 +1147,11 @@ class COCODatasetCaption(ResizableDataset):
         self._filter_valid_annotations()  # New method to filter annotations
         self.images_output_folder = self.cfg.images_output_path
         self.labels_output_path = self.cfg.labels_output_path
-        self.output_annotations = {
-            "images": [],
-            "annotations": [],
-            "categories": list(self.annotations["cats"].values()),
-        }
+        self.output_annotations = self.annotations.dataset
+        self.output_annotations["annotations"] = []
+        self.output_annotations["images"] = []
         if self.cfg.save:
             ensure_folder_exist(Path(self.images_output_folder))
-        self.captions = {img_id: [] for img_id in self.ids}
 
     def _create_annotations(self, annotations_path):
         self.annotations = ConfigDict()
@@ -1015,7 +1216,7 @@ class COCODatasetCaption(ResizableDataset):
             if img_id in valid_img_ids
         }
 
-    def scale(self, img, scale_factor, resize_image_method="bicubic"):
+    def scale(self, img, anns, scale_factor, resize_image_method="bicubic"):
         """
         Scales an image by a specified factor.
 
@@ -1029,7 +1230,31 @@ class COCODatasetCaption(ResizableDataset):
         Returns:
             np.ndarray: The resized image (np.ndarray).
         """
-        return RESIZE_METHODS.get(resize_image_method)(img, scale_factor)
+        return RESIZE_METHODS.get(resize_image_method)(img, scale_factor), anns
+    
+    def reshape(self, img, anns, shape, resize_image_method="bicubic"):
+        """
+        Reshapes an image and its corresponding annotations to a specified size.
+
+        This function resizes the input image and scales the bounding boxes,
+        segmentation and all annotations according to the new dimensions. It offers the
+        option to specify the method used for resizing the image.
+
+        Args:
+            img (np.ndarray): The input image to be resized.
+            anns (list[dict]): A list of annotations corresponding to the image,
+                each containing at least a "bbox" key and optionally "segmentation".
+            shape (tuple): The desired output shape of the image as (width, height).
+            resize_image_method (str, optional): The method used for resizing the
+                image, default is "bicubic". Other methods can be defined in
+                RESIZE_METHODS.
+
+        Returns:
+            tuple: A tuple containing the resized image (np.ndarray) and the updated
+            annotations (list[dict]).
+        """
+        return RESIZE_METHODS.get(resize_image_method)(img, shape), anns
+        
 
     def show(self, image, anns):
         """
@@ -1047,8 +1272,8 @@ class COCODatasetCaption(ResizableDataset):
         """
         img_with_caption = image.copy()
         for ann in anns:
-            cv2.namedWindow(f"Caption: {ann["caption"][0]}", cv2.WINDOW_NORMAL)
-            cv2.imshow(f"Caption: {ann["caption"][0]}", img_with_caption)
+            cv2.namedWindow(f"Caption: {ann["caption"]}", cv2.WINDOW_NORMAL)
+            cv2.imshow(f"Caption: {ann["caption"]}", img_with_caption)
             cv2.waitKey(0)
 
     def __getitem__(self, index):
@@ -1065,22 +1290,25 @@ class COCODatasetCaption(ResizableDataset):
             tuple: A tuple containing the processed image (np.ndarray) and the caption (str).
         """
         img_id = self.ids[index]
-        ann_ids = (
-            [ann["id"] for ann in self.annotations.imgToAnns[img_id]]
-            if img_id in self.annotations.imgToAnns
-            else []
-        )
-        anns = [self.annotations.anns[idx] for idx in ann_ids]
-        path = self.annotations.imgs[img_id]["file_name"]
+        anns = self.annotations["imgToAnns"].get(img_id, [])
+        path = self.annotations["imgs"][img_id]["file_name"]
         img = cv2.imread(str(Path(self.images_folder) / path))
-        img = self.scale(
+        resize_function, resize_parameter = (
+            (self.scale, self.cfg.scale_factor)
+            if self.cfg.image_shape is None
+            else (self.reshape, self.cfg.image_shape)
+        )
+        img, anns = resize_function(
             img,
-            scale_factor=self.cfg.scale_factor,
+            anns,
+            resize_parameter,
             resize_image_method=self.cfg.resize_image_method,
         )
         if self.cfg.save:
             self.save(index, img, anns)
-        return img, [anns]
+        if self.cfg.show:
+            self.show(img, anns)
+        return img, anns
 
     def save(self, index, image, anns):
         """
@@ -1098,19 +1326,11 @@ class COCODatasetCaption(ResizableDataset):
             None: This function does not return any value.
         """
         img_id = self.ids[index]
-        image_name = self.annotations.imgs[img_id]["file_name"]
-        cv2.imwrite(str(Path(self.images_output_folder) / image_name), image)
-        new_height, new_width = image.shape[:2]
-        self.annotations.imgs[img_id]["height"] = new_height
-        self.annotations.imgs[img_id]["width"] = new_width
-        for ann in anns:
-            if ann["id"] not in {
-                a["id"] for a in self.output_annotations["annotations"]
-            }:
-                self.output_annotations["annotations"].append(ann)
-        # Include the image info in the output dictionary
-        if img_id not in {img["id"] for img in self.output_annotations["images"]}:
-            self.output_annotations["images"].append(self.annotations.imgs[img_id])
+        img_ann = self.annotations.imgs[img_id]
+        cv2.imwrite(str(Path(self.images_output_folder) / img_ann["file_name"]), image)
+        img_ann["height"], img_ann["width"] = image.shape[:2]
+        self.output_annotations["annotations"].extend(anns)
+        self.output_annotations["images"].append(img_ann)
 
     def __len__(self):
         """
@@ -1191,11 +1411,9 @@ class COCODatasetKeypoint(ResizableDataset):
         self.images_output_folder = self.cfg.images_output_path
         self.labels_output_path = self.cfg.labels_output_path
         # Initialize the updated COCO dictionary
-        self.output_annotations = {
-            "images": [],
-            "annotations": [],
-            "categories": list(self.annotations["cats"].values()),
-        }
+        self.output_annotations = self.annotations.dataset
+        self.output_annotations["annotations"] = []
+        self.output_annotations["images"] = []
         if self.cfg.save:
             ensure_folder_exist(Path(self.images_output_folder))
 
@@ -1294,6 +1512,12 @@ class COCODatasetKeypoint(ResizableDataset):
         """
         img = RESIZE_METHODS.get(resize_image_method)(img, scale_factor)
         for ann in anns:
+            if "bbox" in ann:
+                bbox = ann["bbox"]
+                ann["bbox"] = [coord * scale_factor for coord in bbox]
+            ann["area"] = ann["area"] * (scale_factor ** 2)
+            if "segmentation" in ann:
+                ann['segmentation'] = [[coord * scale_factor for coord in segment] for segment in ann['segmentation']]
             if "keypoints" in ann:
                 keypoints = ann["keypoints"]
                 scaled_keypoints = []
@@ -1303,6 +1527,55 @@ class COCODatasetKeypoint(ResizableDataset):
                     v = keypoints[i + 2]  # visibility flag remains the same
                     scaled_keypoints.extend([x, y, v])
                 ann["keypoints"] = scaled_keypoints
+        return img, anns
+    
+    def reshape(self, img, anns, shape, resize_image_method="bicubic"):
+        """
+        Reshapes an image and its corresponding annotations to a specified size.
+
+        This function resizes the input image and scales the bounding boxes,
+        segmentation and all annotations according to the new dimensions. It offers the
+        option to specify the method used for resizing the image.
+
+        Args:
+            img (np.ndarray): The input image to be resized.
+            anns (list[dict]): A list of annotations corresponding to the image,
+                each containing at least a "bbox" key and optionally "segmentation".
+            shape (tuple): The desired output shape of the image as (width, height).
+            resize_image_method (str, optional): The method used for resizing the
+                image, default is "bicubic". Other methods can be defined in
+                RESIZE_METHODS.
+
+        Returns:
+            tuple: A tuple containing the resized image (np.ndarray) and the updated
+            annotations (list[dict]).
+        """
+        h0, w0 = img.shape[:2]
+        wn, hn = shape
+        xf = wn / w0
+        yf = hn / h0
+        img = RESIZE_METHODS.get(resize_image_method)(img, shape)
+        for ann in anns:
+            if "bbox" in ann:
+                x1, y1, w, h = ann["bbox"]
+                ann["bbox"] = [x1 * xf, y1 * yf, w * xf, h * yf]
+            if "keypoints" in ann:
+                    keypoints = ann["keypoints"]
+                    scaled_keypoints = []
+                    for i in range(0, len(keypoints), 3):
+                        x = keypoints[i] * xf
+                        y = keypoints[i + 1] * yf
+                        v = keypoints[i + 2]  
+                        scaled_keypoints.extend([x, y, v])
+                    ann["keypoints"] = scaled_keypoints
+            ann["area"] *= xf * yf
+            if "segmentation" in ann:
+                if isinstance(ann["segmentation"], list): 
+                    for i, polygon in enumerate(ann["segmentation"]):
+                        ann["segmentation"][i] = [
+                            c * xf if i % 2 == 0 else c * yf
+                            for i, c in enumerate(polygon)
+                        ]
         return img, anns
 
     def save(self, index, image, anns):
@@ -1315,20 +1588,11 @@ class COCODatasetKeypoint(ResizableDataset):
             anns (list): List of processed annotations.
         """
         img_id = self.ids[index]
-        image_name = self.annotations.imgs[img_id]["file_name"]
-        cv2.imwrite(str(Path(self.images_output_folder) / image_name), image)
-        new_height, new_width = image.shape[:2]
-        self.annotations.imgs[img_id]["height"] = new_height
-        self.annotations.imgs[img_id]["width"] = new_width
-        for ann in anns:
-            if ann["id"] not in {
-                a["id"] for a in self.output_annotations["annotations"]
-            }:
-                self.output_annotations["annotations"].append(ann)
-
-        # Include the image info in the output dictionary
-        if img_id not in {img["id"] for img in self.output_annotations["images"]}:
-            self.output_annotations["images"].append(self.annotations.imgs[img_id])
+        img_ann = self.annotations.imgs[img_id]
+        cv2.imwrite(str(Path(self.images_output_folder) / img_ann["file_name"]), image)
+        img_ann["height"], img_ann["width"] = image.shape[:2]
+        self.output_annotations["annotations"].extend(anns)
+        self.output_annotations["images"].append(img_ann)
 
     def show(self, image, anns):
         """
@@ -1369,27 +1633,25 @@ class COCODatasetKeypoint(ResizableDataset):
             tuple: Processed image and annotations.
         """
         img_id = self.ids[index]
-        ann_ids = (
-            [ann["id"] for ann in self.annotations.imgToAnns[img_id]]
-            if img_id in self.annotations.imgToAnns
-            else []
-        )
-        anns = [self.annotations.anns[idx] for idx in ann_ids]
-        path = self.annotations.imgs[img_id]["file_name"]
+        anns = self.annotations["imgToAnns"].get(img_id, [])
+        path = self.annotations["imgs"][img_id]["file_name"]
         img = cv2.imread(str(Path(self.images_folder) / path))
-
-        if img is None:
-            raise RuntimeError(f"Failed to load image at path {path}")
-
-        img, anns = self.scale(
+        resize_function, resize_parameter = (
+            (self.scale, self.cfg.scale_factor)
+            if self.cfg.image_shape is None
+            else (self.reshape, self.cfg.image_shape)
+        )
+        img, anns = resize_function(
             img,
             anns,
-            scale_factor=self.cfg.scale_factor,
+            resize_parameter,
             resize_image_method=self.cfg.resize_image_method,
         )
         if self.cfg.save:
             self.save(index, img, anns)
-        return img, [anns]
+        if self.cfg.show:
+            self.show(img, anns)
+        return img, anns
 
     def __len__(self):
         """

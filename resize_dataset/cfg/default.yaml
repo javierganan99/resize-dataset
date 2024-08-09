@@ -1,13 +1,13 @@
 dataset_format: "coco"
-dataset_task: "segmentation"
+dataset_task: "densepose"
 task: scale
-scale_factor: 8
+scale_factor: 4
 image_shape: null # or [H,W]
 resize_image_method: "bicubic"
 resize_mask_method: "nearest"
 show: True
 save: False
-images_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\coco_densepose\\archive\\coco2014\\images\\train2014"
-labels_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\coco_densepose\\archive\\coco2014\\annotations\\densepose_train2014.json"
-images_output_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\test_densepose\\images"
-labels_output_path: "C:\\Users\\a926163\\OneDrive - Eviden\\Escritorio\\Github\\datasets\\archive\\coco2017\\test_densepose\\densepose_train2017.json"
+images_path: "/home/fjganan/GitHub/datasets/coco_dataset/val2017"
+labels_path: "/home/fjganan/GitHub/datasets/coco_dataset/panoptic_val2017.json"
+images_output_path: "/home/fjganan/GitHub/resize-dataset/results/coco_dataset/images/"
+labels_output_path: "/home/fjganan/GitHub/resize-dataset/results/coco_dataset/panoptic_val2017.json"

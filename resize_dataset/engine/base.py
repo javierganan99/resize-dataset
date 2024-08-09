@@ -1,5 +1,4 @@
 from tqdm import tqdm
-from torch.utils.data import DataLoader
 from resize_dataset.utils import (
     DEFAULT_CFG,
     colorstr,
@@ -7,12 +6,6 @@ from resize_dataset.utils import (
     TQDM_BAR_FORMAT_GREEN,
 )
 from resize_dataset.dataset import DATASET_REGISTRY
-
-
-def custom_collate_fn(batch):
-    images = [item[0] for item in batch]
-    annotations = [item[1] for item in batch]
-    return images, annotations[0]
 
 
 class ResizeDataset:
@@ -78,20 +71,15 @@ class ResizeDataset:
         Returns:
             None: This function does not return any value.
         """
-        # BUG: The actual collate function what does is to convert dict values to tensor and lists
-        # FIX: Converted to custom collate fn, must be discussed
-        # dataloader = DataLoader(
-        #     self.dataset, batch_size=1, shuffle=False, collate_fn=custom_collate_fn
-        # )
-        for image, annotations in tqdm(
+        i = 0
+        for _, _ in tqdm(
             self.dataset,
             desc=colorstr("📏 Scaling dataset"),
             total=len(self.dataset),
             bar_format=TQDM_BAR_FORMAT_GREEN,
             colour="green",
         ):
-            if self.cfg.show:
-                self.dataset.show(image, annotations[0])
+            pass
         self.dataset.close()
 
     @property
