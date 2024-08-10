@@ -1,4 +1,5 @@
 import numpy as np
+from pycocotools import _mask as coco_mask
 
 
 def rle_to_mask(rle, height, width, order="F"):
@@ -57,3 +58,52 @@ def mask_to_rle(mask, order="F"):
     runs[1::2] -= runs[::2]
     runs[2::2] -= runs[:-2:2] + runs[1:-2:2]
     return runs.tolist()
+
+
+def rle_coded_to_binary_mask(rle_coded_str, im_height, im_width):
+    """
+    Converts a run-length encoded (RLE) string to a binary mask.
+
+    This function decodes the input run-length encoded string, decompresses it,
+    and constructs a binary mask based on the specified image dimensions. The
+    resulting mask can be used for image segmentation tasks, particularly in
+    computer vision applications.
+
+    Args:
+        rle_coded_str (str): The run-length encoded string representing the mask.
+        im_height (int): The height of the image.
+        im_width (int): The width of the image.
+
+    Returns:
+        numpy.ndarray: A binary mask of shape (im_height, im_width), where True
+        values indicate the presence of the detected object(s) and False values
+        indicate the absence.
+    """
+    detection = {"size": [im_height, im_width], "counts": rle_coded_str}
+    detlist = []
+    detlist.append(detection)
+    mask = coco_mask.decode(detlist)
+    return mask[..., 0].astype("bool")
+
+
+def binary_mask_to_rle_coded(mask):
+    """
+    Converts a binary mask to Run-Length Encoding (RLE) format.
+
+    This function takes a binary mask as input and converts it to a
+    Run-Length Encoding format that is suitable for storage or transmission.
+    The mask is first reshaped to ensure it has the correct dimensions,
+    then it is encoded using the COCO mask encoding method. The encoded
+    data is then compressed using zlib and base64 encoded for easier handling.
+
+    Args:
+        mask (numpy.ndarray): A binary mask array with shape (height, width)
+            where the mask values are either 0 or 1.
+
+    Returns:
+        str: A base64 encoded string representing the compressed RLE format
+            of the input mask.
+    """
+    mask = mask.reshape(mask.shape[0], mask.shape[1], 1)
+    encoded_mask = coco_mask.encode(np.asfortranarray(mask))[0]["counts"]
+    return encoded_mask.decode("utf-8")

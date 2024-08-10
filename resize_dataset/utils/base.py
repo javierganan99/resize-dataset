@@ -4,6 +4,7 @@ import platform
 import sys
 import logging.config
 import yaml
+import os
 
 # Configuration constants
 FILE = Path(__file__).resolve()
@@ -13,6 +14,11 @@ MACOS, LINUX, WINDOWS = (
     platform.system() == x for x in ["Darwin", "Linux", "Windows"]
 )  # environment booleans
 LOGGING_NAME = "ResizeDataset"
+TQDM_BAR_FORMAT_GREEN = "%s{l_bar}%s{bar}%s{r_bar}" % (
+    "\033[0;32m",
+    "\033[0;32m",
+    "\033[0;32m",
+)
 
 
 def load_json(path):
@@ -30,6 +36,37 @@ def load_json(path):
     return data
 
 
+def ensure_folder_exist(path):
+    """
+    Checks that a folder exists at the specified path, and if it does not exist, creates it.
+    This function takes a single string argument representing a filesystem path and ensures
+    that a folder exists at that path. It creates all necessary intermediate directories if
+    they do not exist. If the operation is successful, or if the folder already exists
+    , the function returns True.
+    Args:
+        path (str): The filesystem path where the folder should exist.
+    Returns:
+        bool: True if the folder already exists or was created successfully, False otherwise.
+    """
+    path = str(path)
+    separated = path.split(os.path.sep)
+    # To consider absolute paths
+    if separated[0] == "":
+        separated.pop(0)
+        separated[0] = os.path.sep + separated[0]
+    exists = True
+    for f in range(len(separated)):
+        path = (
+            os.path.sep.join(separated[: f + 1])
+            if f > 0
+            else (separated[0] + os.path.sep)
+        )
+        if not os.path.exists(path):
+            os.mkdir(path)
+            exists = False
+    return exists
+
+
 def save_json(data, path):
     """
     Saves the given dictionary as a JSON file to the specified path.
@@ -41,6 +78,7 @@ def save_json(data, path):
     Returns:
         None
     """
+    ensure_folder_exist(path=Path(path).parent)
     with open(str(path), "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
 

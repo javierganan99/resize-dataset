@@ -1,4 +1,6 @@
 datasets/
 __pycache__/
 results/
+test.py
 *_build
+dist/

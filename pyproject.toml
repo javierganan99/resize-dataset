@@ -6,7 +6,6 @@ authors = ["fjganan14 <fjganan14@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-matplotlib = "3.9.0"
 python = "^3.10"
 opencv-python = "^4.10.0.84"
 torch = "2.3.0"
