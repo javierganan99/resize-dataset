@@ -1,11 +1,9 @@
 import os
 from pathlib import Path
 import cv2
-import matplotlib.pyplot as plt
 import torch
 import numpy as np
 import pycocotools.mask as mask_utils
-from pycocotools import _mask as coco_mask
 from resize_dataset.image import RESIZE_METHODS
 from resize_dataset.label import (
     VISUALIZATION_REGISTRY,
@@ -19,59 +17,14 @@ from resize_dataset.utils import (
     ensure_folder_exist,
     LOGGER,
 )
+from resize_dataset.label.conversion import (
+    rle_coded_to_binary_mask,
+    binary_mask_to_rle_coded,
+)
 from .utils import generate_n_unique_colors
 from .base import ResizableDataset
 
 COCO_TASKS = ConfigDict()
-
-
-def rle_coded_to_binary_mask(rle_coded_str, im_height, im_width):
-    """
-    Converts a run-length encoded (RLE) string to a binary mask.
-
-    This function decodes the input run-length encoded string, decompresses it,
-    and constructs a binary mask based on the specified image dimensions. The
-    resulting mask can be used for image segmentation tasks, particularly in
-    computer vision applications.
-
-    Args:
-        rle_coded_str (str): The run-length encoded string representing the mask.
-        im_height (int): The height of the image.
-        im_width (int): The width of the image.
-
-    Returns:
-        numpy.ndarray: A binary mask of shape (im_height, im_width), where True
-        values indicate the presence of the detected object(s) and False values
-        indicate the absence.
-    """
-    detection = {"size": [im_height, im_width], "counts": rle_coded_str}
-    detlist = []
-    detlist.append(detection)
-    mask = coco_mask.decode(detlist)
-    return mask[..., 0].astype("bool")
-
-
-def binary_mask_to_rle_coded(mask):
-    """
-    Converts a binary mask to Run-Length Encoding (RLE) format.
-
-    This function takes a binary mask as input and converts it to a
-    Run-Length Encoding format that is suitable for storage or transmission.
-    The mask is first reshaped to ensure it has the correct dimensions,
-    then it is encoded using the COCO mask encoding method. The encoded
-    data is then compressed using zlib and base64 encoded for easier handling.
-
-    Args:
-        mask (numpy.ndarray): A binary mask array with shape (height, width)
-            where the mask values are either 0 or 1.
-
-    Returns:
-        str: A base64 encoded string representing the compressed RLE format
-            of the input mask.
-    """
-    mask = mask.reshape(mask.shape[0], mask.shape[1], 1)
-    encoded_mask = coco_mask.encode(np.asfortranarray(mask))[0]["counts"]
-    return encoded_mask.decode("utf-8")
 
 
 @COCO_TASKS.register(name="segmentation")
@@ -129,6 +82,9 @@ class COCODataset(ResizableDataset):
         self.output_annotations["images"] = []
         if self.cfg.save:
             ensure_folder_exist(self.images_output_folder)
+        # To show
+        self._window_name = "Annotations"
+        self._window = None
 
     def _create_annotations(self, annotations_path):
         """
@@ -303,16 +259,8 @@ class COCODataset(ResizableDataset):
         img_id = self.ids[index]
         img_ann = self.annotations.imgs[img_id]
         cv2.imwrite(str(Path(self.images_output_folder) / img_ann["file_name"]), image)
-        self.output_annotations["annotations"].append(anns)
-        if self.cfg.image_shape is None:
-            sfx = self.cfg.scale_factor
-            sfy = self.cfg.scale_factor
-        else:
-            wn, hn = self.cfg.image_shape
-            sfx = wn / img_ann["width"]
-            sfy = hn / img_ann["height"]
-        img_ann["width"] *= sfx
-        img_ann["height"] *= sfy
+        img_ann["height"], img_ann["width"] = image.shape[:2]
+        self.output_annotations["annotations"].extend(anns)
         self.output_annotations["images"].append(img_ann)
 
     def show(self, image, anns):
@@ -370,8 +318,9 @@ class COCODataset(ResizableDataset):
                 self.id2name[class_id],
                 color=self.id2color[class_id],
             )
-        cv2.namedWindow("Annotations", cv2.WINDOW_NORMAL)
-        cv2.imshow("Annotations", img_with_annotations)
+        if not self._window:
+            self._window = cv2.namedWindow(self._window_name, cv2.WINDOW_NORMAL)
+        cv2.imshow(self._window_name, img_with_annotations)
         cv2.waitKey(0)
 
     def __getitem__(self, index):
@@ -434,6 +383,8 @@ class COCODataset(ResizableDataset):
         in the specified labels output path.
         """
         save_json(self.output_annotations, self.labels_output_path)
+        if self._window:
+            cv2.destroyWindow(self._window_name)
 
 
 @COCO_TASKS.register(name="panoptic")
@@ -511,6 +462,9 @@ class COCODatasetPanoptic(ResizableDataset):
         self.output_annotations["images"] = []
         if self.cfg.save:
             ensure_folder_exist(self.images_output_folder)
+        # To show
+        self._window_name = "Annotations"
+        self._window = None
 
     def _create_annotations(self, annotations_path):
         """
@@ -642,16 +596,8 @@ class COCODatasetPanoptic(ResizableDataset):
             str(Path(self.labels_output_folder) / annotation["file_name"]),
             scaled_mask,
         )
+        img_ann["height"], img_ann["width"] = image.shape[:2]
         self.output_annotations["annotations"].append(annotation)
-        if self.cfg.image_shape is None:
-            sfx = self.cfg.scale_factor
-            sfy = self.cfg.scale_factor
-        else:
-            wn, hn = self.cfg.image_shape
-            sfx = wn / img_ann["width"]
-            sfy = hn / img_ann["height"]
-        img_ann["width"] *= sfx
-        img_ann["height"] *= sfy
         self.output_annotations["images"].append(img_ann)
 
     def show(self, image, anns):
@@ -695,8 +641,9 @@ class COCODatasetPanoptic(ResizableDataset):
                 self.id2name[class_id],
                 color=color,
             )
-        cv2.namedWindow("Annotations", cv2.WINDOW_NORMAL)
-        cv2.imshow("Annotations", img_with_annotations)
+        if not self._window:
+            self._window = cv2.namedWindow(self._window_name, cv2.WINDOW_NORMAL)
+        cv2.imshow(self._window_name, img_with_annotations)
         cv2.waitKey(0)
 
     def __getitem__(self, index):
@@ -759,6 +706,8 @@ class COCODatasetPanoptic(ResizableDataset):
             self.output_annotations,
             self.labels_output_path,
         )
+        if self._window:
+            cv2.destroyWindow(self._window_name)
 
 
 @COCO_TASKS.register(name="densepose")
@@ -827,6 +776,9 @@ class COCODatasetDensePose(ResizableDataset):
         self.output_annotations["images"] = []
         if self.cfg.save:
             ensure_folder_exist(self.images_output_folder)
+        # To show
+        self._window_name = "Annotations"
+        self._window = None
 
     def _create_annotations(self, annotations_path):
         """
@@ -1076,11 +1028,14 @@ class COCODatasetDensePose(ResizableDataset):
                 - "keypoints": Keypoints for different body regions.
                 - Other DensePose-specific annotations.
         """
+        if not self._window:
+            self._window = cv2.namedWindow(self._window_name, cv2.WINDOW_NORMAL)
         img_with_annotations = image.copy()
-        fig = VISUALIZATION_REGISTRY.densepose(img_with_annotations, anns)
-        plt.show(block=False)
-        plt.waitforbuttonpress()
-        plt.close(fig)
+        stacked_annotations = VISUALIZATION_REGISTRY.densepose(
+            img_with_annotations, anns
+        )
+        cv2.imshow(self._window_name, stacked_annotations)
+        cv2.waitKey(0)
 
     def __getitem__(self, index):
         """
@@ -1166,6 +1121,8 @@ class COCODatasetDensePose(ResizableDataset):
         Saves all DensePose annotations to a JSON file specified in the labels_output_path.
         """
         save_json(self.output_annotations, self.labels_output_path)
+        if self._window:
+            cv2.destroyWindow(self._window_name)
 
 
 @COCO_TASKS.register(name="caption")
@@ -1214,6 +1171,9 @@ class COCODatasetCaption(ResizableDataset):
         self.output_annotations["images"] = []
         if self.cfg.save:
             ensure_folder_exist(self.images_output_folder)
+        # To show
+        self._window_name = "Annotations"
+        self._window = None
 
     def _create_annotations(self, annotations_path):
         self.annotations = ConfigDict()
@@ -1331,10 +1291,12 @@ class COCODatasetCaption(ResizableDataset):
         Returns:
             None: This function does not return any value.
         """
-        img_with_caption = image.copy()
+        if not self._window:
+            self._window = cv2.namedWindow(self._window_name, cv2.WINDOW_NORMAL)
         for ann in anns:
-            cv2.namedWindow(f"Caption: {ann['caption']}", cv2.WINDOW_NORMAL)
-            cv2.imshow(f"Caption: {ann['caption']}", img_with_caption)
+            img_with_caption = image.copy()
+            VISUALIZATION_REGISTRY.caption(img_with_caption, ann["caption"])
+            cv2.imshow(self._window_name, img_with_caption)
             cv2.waitKey(0)
 
     def __getitem__(self, index):
@@ -1415,10 +1377,12 @@ class COCODatasetCaption(ResizableDataset):
             self.output_annotations,
             self.labels_output_path,
         )
+        if self._window:
+            cv2.destroyWindow(self._window_name)
 
 
-@COCO_TASKS.register(name="keypoint")
-class COCODatasetKeypoint(ResizableDataset):
+@COCO_TASKS.register(name="keypoints")
+class COCODatasetKeypoints(ResizableDataset):
     """
     A dataset class for handling COCO-format keypoint annotations, supporting
     image scaling, annotation filtering, and image loading operations.
@@ -1464,7 +1428,6 @@ class COCODatasetKeypoint(ResizableDataset):
         self.id2name = {k: v["name"] for k, v in self.annotations.cats.items()}
         self.name2id = {v: k for k, v in self.id2name.items()}
         self.id2color = generate_n_unique_colors(self.id2name.keys())
-        self.id2cat = self.annotations.cats
         # To save
         self.images_output_folder = self.cfg.images_output_path
         self.labels_output_path = self.cfg.labels_output_path
@@ -1474,6 +1437,9 @@ class COCODatasetKeypoint(ResizableDataset):
         self.output_annotations["images"] = []
         if self.cfg.save:
             ensure_folder_exist(self.images_output_folder)
+        # To show
+        self._window_name = "Annotations"
+        self._window = None
 
     def _create_annotations(self, annotations_path):
         """
@@ -1569,14 +1535,36 @@ class COCODatasetKeypoint(ResizableDataset):
         img = RESIZE_METHODS.get(resize_image_method)(img, scale_factor)
         for ann in anns:
             if "bbox" in ann:
-                bbox = ann["bbox"]
-                ann["bbox"] = [coord * scale_factor for coord in bbox]
-            ann["area"] = ann["area"] * (scale_factor**2)
+                ann["bbox"] = [c * scale_factor for c in ann["bbox"]]
+            ann["area"] *= scale_factor**2
             if "segmentation" in ann:
-                ann["segmentation"] = [
-                    [coord * scale_factor for coord in segment]
-                    for segment in ann["segmentation"]
-                ]
+                if isinstance(ann["segmentation"], list):  # Segmentation polygon
+                    for i, polygon in enumerate(ann["segmentation"]):
+                        ann["segmentation"][i] = [c * scale_factor for c in polygon]
+                else:
+                    seg = ann["segmentation"]
+                    h, w = seg["size"]
+                    if isinstance(ann["segmentation"]["counts"], str):
+                        mask = mask_utils.decode(ann["segmentation"])
+                    else:
+                        mask = rle_to_mask(seg["counts"], h, w, order="F")
+                    resized_mask = cv2.resize(
+                        mask,
+                        (w * scale_factor, h * scale_factor),
+                        interpolation=cv2.INTER_NEAREST,
+                    ).astype(np.uint8)
+                    if isinstance(ann["segmentation"]["counts"], str):
+                        ann["segmentation"]["counts"] = binary_mask_to_rle_coded(
+                            resized_mask
+                        )
+                    else:
+                        ann["segmentation"]["counts"] = mask_to_rle(
+                            resized_mask, order="F"
+                        )
+                    ann["segmentation"]["size"] = [
+                        h * scale_factor,
+                        w * scale_factor,
+                    ]
             if "keypoints" in ann:
                 keypoints = ann["keypoints"]
                 scaled_keypoints = []
@@ -1635,6 +1623,27 @@ class COCODatasetKeypoint(ResizableDataset):
                             c * xf if i % 2 == 0 else c * yf
                             for i, c in enumerate(polygon)
                         ]
+                else:
+                    seg = ann["segmentation"]
+                    h0, w0 = seg["size"]
+                    xf = wn / w0
+                    yf = hn / h0
+                    if isinstance(ann["segmentation"]["counts"], str):
+                        mask = mask_utils.decode(ann["segmentation"])
+                    else:
+                        mask = rle_to_mask(seg["counts"], h0, w0, order="F")
+                    resized_mask = cv2.resize(
+                        mask, shape, interpolation=cv2.INTER_NEAREST
+                    ).astype(np.uint8)
+                    if isinstance(ann["segmentation"]["counts"], str):
+                        ann["segmentation"]["counts"] = binary_mask_to_rle_coded(
+                            resized_mask
+                        )
+                    else:
+                        ann["segmentation"]["counts"] = mask_to_rle(
+                            resized_mask, order="F"
+                        )
+                    ann["segmentation"]["size"] = [hn, wn]
         return img, anns
 
     def save(self, index, image, anns):
@@ -1662,24 +1671,25 @@ class COCODatasetKeypoint(ResizableDataset):
             anns (list): List of annotations to be displayed on the image.
         """
         img_with_annotations = image.copy()
-        for ann in anns:
+        colors = generate_n_unique_colors(len(anns))
+        for i, ann in enumerate(anns):
             if "keypoints" in ann:
-                class_id = (
-                    ann["category_id"].item()
-                    if isinstance(ann["category_id"], torch.Tensor)
-                    else ann["category_id"]
-                )
-                category_info = self.id2cat.get(class_id, {})
+                category_info = self.annotations.cats.get(ann["category_id"], {})
+                skeleton = np.array(category_info.get("skeleton", [])) - 1
                 label = {
-                    "skeleton": category_info.get("skeleton", []),
+                    "keypoints": ann["keypoints"],
+                    "skeleton": skeleton,
+                    "segmentation": ann.get("segmentation", None),
                 }
                 img_with_annotations = VISUALIZATION_REGISTRY.keypoints(
-                    img_with_annotations, ann["keypoints"], label=label
+                    img_with_annotations,
+                    label,
+                    color=colors[i],
                 )
-        cv2.namedWindow("Annotations", cv2.WINDOW_NORMAL)
-        cv2.imshow("Annotations", img_with_annotations)
+        if not self._window:
+            self._window = cv2.namedWindow(self._window_name, cv2.WINDOW_NORMAL)
+        cv2.imshow(self._window_name, img_with_annotations)
         cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
     def __getitem__(self, index):
         """
@@ -1726,3 +1736,5 @@ class COCODatasetKeypoint(ResizableDataset):
         Saves the output annotations to a file.
         """
         save_json(self.output_annotations, self.labels_output_path)
+        if self._window:
+            cv2.destroyWindow(self._window_name)
