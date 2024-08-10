@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>label package &mdash; Resize Dataset 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="utils package" href="resize_dataset.utils.html" />
+    <link rel="prev" title="image package" href="resize_dataset.image.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Resize Dataset
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">resize-dataset</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="resize_dataset.html">resize_dataset package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="resize_dataset.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="resize_dataset.cfg.html">cfg package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="resize_dataset.dataset.html">dataset package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="resize_dataset.engine.html">engine package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="resize_dataset.image.html">image package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">label package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="resize_dataset.utils.html">utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="resize_dataset.html#module-resize_dataset">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Resize Dataset</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">resize-dataset</a></li>
+          <li class="breadcrumb-item"><a href="resize_dataset.html">resize_dataset package</a></li>
+      <li class="breadcrumb-item active">label package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/resize_dataset.label.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="label-package">
+<h1>label package<a class="headerlink" href="#label-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-resize_dataset.label.conversion">
+<span id="conversion"></span><h2>conversion<a class="headerlink" href="#module-resize_dataset.label.conversion" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.conversion.binary_mask_to_rle_coded">
+<span class="sig-name descname"><span class="pre">binary_mask_to_rle_coded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.conversion.binary_mask_to_rle_coded" title="Link to this definition"></a></dt>
+<dd><p>Converts a binary mask to Run-Length Encoding (RLE) format.</p>
+<p>This function takes a binary mask as input and converts it to a
+Run-Length Encoding format that is suitable for storage or transmission.
+The mask is first reshaped to ensure it has the correct dimensions,
+then it is encoded using the COCO mask encoding method. The encoded
+data is then compressed using zlib and base64 encoded for easier handling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mask</strong> (<em>numpy.ndarray</em>) – A binary mask array with shape (height, width)
+where the mask values are either 0 or 1.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A base64 encoded string representing the compressed RLE format</dt><dd><p>of the input mask.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.conversion.mask_to_rle">
+<span class="sig-name descname"><span class="pre">mask_to_rle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'F'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.conversion.mask_to_rle" title="Link to this definition"></a></dt>
+<dd><p>Converts a 2D numpy array mask to RLE (Run-Length Encoded) format.</p>
+<p>This function takes a binary mask (2D numpy array) and encodes it using
+Run-Length Encoding (RLE). The RLE format is useful for compression and
+efficient storage of sparse binary images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> (<em>np.ndarray</em>) – The 2D mask array to be encoded.</p></li>
+<li><p><strong>order</strong> (<em>str</em><em>, </em><em>optional</em>) – The order in which to read the mask.
+‘F’ for Fortran order (column-major), ‘C’ for C order (row-major).
+Default is ‘F’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The RLE encoded mask in the format [start1, length1, start2,</dt><dd><p>length2, …] where start is relative to the last position of 1.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.conversion.rle_coded_to_binary_mask">
+<span class="sig-name descname"><span class="pre">rle_coded_to_binary_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rle_coded_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">im_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">im_width</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.conversion.rle_coded_to_binary_mask" title="Link to this definition"></a></dt>
+<dd><p>Converts a run-length encoded (RLE) string to a binary mask.</p>
+<p>This function decodes the input run-length encoded string, decompresses it,
+and constructs a binary mask based on the specified image dimensions. The
+resulting mask can be used for image segmentation tasks, particularly in
+computer vision applications.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rle_coded_str</strong> (<em>str</em>) – The run-length encoded string representing the mask.</p></li>
+<li><p><strong>im_height</strong> (<em>int</em>) – The height of the image.</p></li>
+<li><p><strong>im_width</strong> (<em>int</em>) – The width of the image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A binary mask of shape (im_height, im_width), where True
+values indicate the presence of the detected object(s) and False values
+indicate the absence.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.conversion.rle_to_mask">
+<span class="sig-name descname"><span class="pre">rle_to_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'F'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.conversion.rle_to_mask" title="Link to this definition"></a></dt>
+<dd><p>Converts a Run-Length Encoded (RLE) mask to a 2D numpy array.</p>
+<p>This function takes an RLE representation of a binary mask, which specifies the
+locations and lengths of runs of pixels set to 1, and converts it into a 2D
+numpy array of the specified height and width.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rle</strong> (<em>list</em>) – Run-length encoded mask in the format
+[start1, length1, start2, length2, …], where ‘start’ indicates
+the number of pixels to skip from the last position of 1.</p></li>
+<li><p><strong>height</strong> (<em>int</em>) – Height of the resulting mask.</p></li>
+<li><p><strong>width</strong> (<em>int</em>) – Width of the resulting mask.</p></li>
+<li><p><strong>order</strong> (<em>str</em><em>, </em><em>optional</em>) – Multi-dimensional data layout order. Default is ‘F’
+(Fortran-style column-major order).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The decoded mask represented as a 2D numpy array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-resize_dataset.label.visualization">
+<span id="visualization"></span><h2>visualization<a class="headerlink" href="#module-resize_dataset.label.visualization" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.visualization.add_bounding_box">
+<span class="sig-name descname"><span class="pre">add_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">255,</span> <span class="pre">255)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.visualization.add_bounding_box" title="Link to this definition"></a></dt>
+<dd><p>Draws a bounding box on the given image with an optional label.</p>
+<p>This function adds a rectangular bounding box to an image, which can also include a label.
+The bounding box color and text color can be customized. The width of the bounding box is
+calculated based on the size of the image to ensure it is visually appropriate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>numpy.ndarray</em>) – The image on which to draw the bounding box.</p></li>
+<li><p><strong>bbox</strong> (<em>tuple</em>) – A tuple containing (x, y, width, height) of the bounding box.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – The label text to be displayed. Defaults to None.</p></li>
+<li><p><strong>color</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The color of the bounding box in BGR format.
+Default is (255, 0, 0).</p></li>
+<li><p><strong>text_color</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The color of the label text in BGR format.
+Default is (255, 255, 255).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The image with the bounding box and label drawn on it.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.visualization.add_caption">
+<span class="sig-name descname"><span class="pre">add_caption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">10,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">255,</span> <span class="pre">255)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.visualization.add_caption" title="Link to this definition"></a></dt>
+<dd><p>Adds a caption overlay to an image with customizable text, font, and colors.</p>
+<p>This function computes the optimal placement for the caption, ensuring it
+fits within the given image dimensions. It also blends a background box
+behind the text to enhance visibility, applying a specified opacity to
+the blend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>numpy.ndarray</em>) – The image to which the caption will be added.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – The text of the caption to overlay on the image.</p></li>
+<li><p><strong>font</strong> (<em>int</em><em>, </em><em>optional</em>) – The font type for the text (default is cv2.FONT_HERSHEY_SIMPLEX).</p></li>
+<li><p><strong>box_color</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The color of the box behind the text in BGR format
+(default is (0, 10, 0)).</p></li>
+<li><p><strong>text_color</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The color of the text in BGR format
+(default is (255, 255, 255)).</p></li>
+<li><p><strong>opacity</strong> (<em>float</em><em>, </em><em>optional</em>) – The opacity for the text overlay (default is 0.7).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This function modifies the input image in place and does not return a value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.visualization.add_dense_poses">
+<span class="sig-name descname"><span class="pre">add_dense_poses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.visualization.add_dense_poses" title="Link to this definition"></a></dt>
+<dd><p>Creates an image showing DensePose annotations stacked horizontally.</p>
+<p>This function processes an input image and overlays DensePose annotations,
+including patch indices, U coordinates, and V coordinates, on top of it.
+The annotations are visualized as circles representing different features
+based on the provided annotations data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The input image to annotate.</p></li>
+<li><p><strong>anns</strong> (<em>list</em><em> of </em><em>dict</em>) – List of annotations containing DensePose data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resulting image with annotations stacked horizontally.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.visualization.add_keypoints">
+<span class="sig-name descname"><span class="pre">add_keypoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.visualization.add_keypoints" title="Link to this definition"></a></dt>
+<dd><p>Adds keypoints and segmentation to the provided image based on the given annotation.</p>
+<p>This function processes the annotation to retrieve keypoint positions and
+segmentation masks. It draws keypoints as filled circles and connects them
+with lines if a skeleton is defined. If segmentation is present, it can
+draw polygons or a binary mask onto the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.nd</em>) – The image on which keypoints and segmentation will be drawn.</p></li>
+<li><p><strong>annotation</strong> (<em>dict</em>) – A dictionary containing keypoints, skeleton, and segmentation data.</p></li>
+<li><p><strong>color</strong> (<em>tuple</em><em>, </em><em>optional</em>) – A tuple representing the color in RGB format
+(default is (255, 0, 0)).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The modified image with keypoints and segmentation drawn on it.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.nd</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.visualization.add_mask">
+<span class="sig-name descname"><span class="pre">add_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">255,</span> <span class="pre">255)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.visualization.add_mask" title="Link to this definition"></a></dt>
+<dd><p>Adds a mask to the image with an optional label.</p>
+<p>This function overlays a specified mask on the provided image, allowing for customization
+of the mask’s color, transparency, and optional labeling. The mask is applied using a
+weighted addition approach, and the label can be displayed at the center of the masked
+area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The image on which to draw the mask.</p></li>
+<li><p><strong>mask</strong> (<em>np.ndarray</em>) – Boolean mask array with shape HxW.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional. The label to display with the mask.</p></li>
+<li><p><strong>color</strong> (<em>tuple</em>) – The color for the mask (B, G, R).</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Transparency factor for the mask fill (0.0 to 1.0).</p></li>
+<li><p><strong>text_color</strong> (<em>tuple</em>) – The color for the label text (B, G, R).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The image with the mask drawn.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.visualization.add_polygons">
+<span class="sig-name descname"><span class="pre">add_polygons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polygons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">255,</span> <span class="pre">255)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.visualization.add_polygons" title="Link to this definition"></a></dt>
+<dd><p>Draws segmentation polygons on the image with optional labels and fills them with transparency.</p>
+<p>This function overlays the given polygons on the specified image, allowing for adjustable
+transparency, color, and optional text labels for each polygon. The polygons are filled
+with a specified color and transparency level, and if a label is provided, it is drawn on
+the image in a specified text color.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The image on which to draw the polygons.</p></li>
+<li><p><strong>polygons</strong> (<em>list</em>) – List of segmentation polygons, where each polygon is a list of coordinates.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Optional. The label to display with the polygon.</p></li>
+<li><p><strong>color</strong> (<em>tuple</em>) – The color for the polygon (B, G, R) (default is (255, 0, 0)).</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Transparency factor for the polygon fill (0.0 to 1.0) (default is 0.25).</p></li>
+<li><p><strong>text_color</strong> (<em>tuple</em>) – The color for the label text (B, G, R) (default is (255, 255, 255)).</p></li>
+<li><p><strong>line_width</strong> (<em>int</em><em>, </em><em>optional</em>) – Optional. The width of the polygon outline
+(default is calculated based on image size).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The image with drawn polygons.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.visualization.apply_colormap">
+<span class="sig-name descname"><span class="pre">apply_colormap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.visualization.apply_colormap" title="Link to this definition"></a></dt>
+<dd><p>Maps a normalized value to a color using a colormap.</p>
+<p>This function takes an array of normalized values (between 0 and 1) and applies a color
+mapping to produce corresponding BGR color values using OpenCV’s applyColorMap function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>values</strong> (<em>np.ndarray</em>) – A (n, 3) array of normalized values between 0 and 1 to map to colors.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A (n, 3) array representing the BGR color corresponding to the input values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.visualization.draw_rounded_rectangle">
+<span class="sig-name descname"><span class="pre">draw_rounded_rectangle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bottom_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.visualization.draw_rounded_rectangle" title="Link to this definition"></a></dt>
+<dd><p>Draws a rounded rectangle on the given image.</p>
+<p>This function adds a rectangle with rounded corners to an image using specified
+color, corner radius, and thickness. It utilizes OpenCV functions to render both the
+corners and the edges of the rectangle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>ndarray</em>) – The image on which to draw the rectangle.</p></li>
+<li><p><strong>top_left</strong> (<em>tuple</em>) – The (x, y) coordinates of the top-left corner of the rectangle.</p></li>
+<li><p><strong>bottom_right</strong> (<em>tuple</em>) – The (x, y) coordinates of the bottom-right corner of the rectangle.</p></li>
+<li><p><strong>color</strong> (<em>tuple</em>) – The RGB color for the rectangle.</p></li>
+<li><p><strong>radius</strong> (<em>int</em>) – The radius of the corners of the rectangle.</p></li>
+<li><p><strong>thickness</strong> (<em>int</em><em>, </em><em>optional</em>) – The thickness of the rectangle edges. Default is -1 for filled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This function modifies the image in place and does not return a value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-resize_dataset.label">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-resize_dataset.label" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="resize_dataset.image.html" class="btn btn-neutral float-left" title="image package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="resize_dataset.utils.html" class="btn btn-neutral float-right" title="utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francisco Javier Gañan, German Ferrando.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

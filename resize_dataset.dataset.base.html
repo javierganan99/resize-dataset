@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dataset.base module &mdash; Resize Dataset 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Resize Dataset
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">resize-dataset</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Resize Dataset</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">dataset.base module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/resize_dataset.dataset.base.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-resize_dataset.dataset.base">
+<span id="dataset-base-module"></span><h1>dataset.base module<a class="headerlink" href="#module-resize_dataset.dataset.base" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="resize_dataset.dataset.base.ResizableDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ResizableDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.base.ResizableDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Abstract base class for resizable datasets.</p>
+<p>This class defines a framework for datasets that support resizing images
+and their corresponding annotations. It must be subclassed to implement
+specific dataset formats.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.base.ResizableDataset.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.base.ResizableDataset.scale" title="Link to this definition"></a></dt>
+<dd><p>Scales the given image
+and annotations by a scale factor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.base.ResizableDataset.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.base.ResizableDataset.show" title="Link to this definition"></a></dt>
+<dd><p>Displays the image along with its annotations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.base.ResizableDataset.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.base.ResizableDataset.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the image and annotations at the specified index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.base.ResizableDataset.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.base.ResizableDataset.__len__" title="Link to this definition"></a></dt>
+<dd><p>Returns the total number of items in the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.base.ResizableDataset.close">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.base.ResizableDataset.close" title="Link to this definition"></a></dt>
+<dd><p>Perform the needed operations when closing the dataset,
+such as saving information, closing files, etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.base.ResizableDataset.reshape">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.base.ResizableDataset.reshape" title="Link to this definition"></a></dt>
+<dd><p>Reshape an image and its associated annotations by a specified factor.</p>
+<p>This function adjusts the size of the input image and modifies the annotations accordingly
+to maintain their relevance after resizing. The image can be resized using different methods
+specified by the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The image to be scaled, represented as a NumPy array.</p></li>
+<li><p><strong>anns</strong> (<em>list</em>) – A list of annotations associated with the image, which will also be scaled.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em>) – The new shape of the image and annotations.</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em>) – The method used for resizing the image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A tuple containing the scaled image (np.ndarray)</dt><dd><p>and the modified annotations (list).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.base.ResizableDataset.save">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.base.ResizableDataset.save" title="Link to this definition"></a></dt>
+<dd><p>Saves an image along with its associated annotations.</p>
+<p>This function is designed to save an image along with any given annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The image to be displayed.</p></li>
+<li><p><strong>anns</strong> (<em>List</em><em>[</em><em>AnnotationType</em><em>]</em>) – A list of annotations to be saved.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Scales an image and its associated annotations by a specified factor.</p>
+<p>This function adjusts the size of the input image and modifies the annotations accordingly
+to maintain their relevance after scaling. The image can be resized using different methods
+specified by the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The image to be scaled, represented as a NumPy array.</p></li>
+<li><p><strong>anns</strong> (<em>list</em>) – A list of annotations associated with the image, which will also be scaled.</p></li>
+<li><p><strong>scale_factor</strong> (<em>float</em>) – The factor by which to scale the image and annotations.</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em>) – The method used for resizing the image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A tuple containing the scaled image (np.ndarray)</dt><dd><p>and the modified annotations (list).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd><p>Displays an image along with its associated annotations.</p>
+<p>This function is designed to visualize an image along with any given annotations,
+allowing users to easily understand the content of the image and the context
+provided by the annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The image to be displayed.</p></li>
+<li><p><strong>anns</strong> (<em>List</em><em>[</em><em>AnnotationType</em><em>]</em>) – A list of annotations to overlay on the image.
+Each annotation should include necessary details depending on the task.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francisco Javier Gañan, German Ferrando.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

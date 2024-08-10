@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dataset.coco module &mdash; Resize Dataset 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Resize Dataset
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">resize-dataset</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Resize Dataset</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">dataset.coco module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/resize_dataset.dataset.coco.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-resize_dataset.dataset.coco">
+<span id="dataset-coco-module"></span><h1>dataset.coco module<a class="headerlink" href="#module-resize_dataset.dataset.coco" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">COCODataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="resize_dataset.dataset.base.html#resize_dataset.dataset.base.ResizableDataset" title="resize_dataset.dataset.base.ResizableDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResizableDataset</span></code></a></p>
+<p>Dataset class for loading and processing images and annotations in COCO format.</p>
+<p>This class provides functionality to initialize a dataset from a specified images path
+and annotations path, retrieve images and annotations, scale images and annotations based
+on a given factor, and visualize the annotations on images. It is designed for detection
+and segmentation tasks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images_path</strong> (<em>str</em>) – Path to the folder containing images.</p></li>
+<li><p><strong>annotations_path</strong> (<em>str</em>) – Path to the COCO annotations JSON file.</p></li>
+<li><p><strong>cfg</strong> (<a class="reference internal" href="resize_dataset.utils.base.html#resize_dataset.utils.base.ConfigDict" title="resize_dataset.utils.base.ConfigDict"><em>ConfigDict</em></a>) – Configuration object containing scaling and resizing parameters.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.cfg">
+<span class="sig-name descname"><span class="pre">cfg</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.cfg" title="Link to this definition"></a></dt>
+<dd><p>Configuration object containing scaling and resizing parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="resize_dataset.utils.base.html#resize_dataset.utils.base.ConfigDict" title="resize_dataset.utils.base.ConfigDict">ConfigDict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.images_folder">
+<span class="sig-name descname"><span class="pre">images_folder</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.images_folder" title="Link to this definition"></a></dt>
+<dd><p>Path to the folder containing images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.annotations">
+<span class="sig-name descname"><span class="pre">annotations</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.annotations" title="Link to this definition"></a></dt>
+<dd><p>COCO object representing the annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>COCO</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.ids">
+<span class="sig-name descname"><span class="pre">ids</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.ids" title="Link to this definition"></a></dt>
+<dd><p>Sorted list of image IDs in the annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.id2name">
+<span class="sig-name descname"><span class="pre">id2name</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.id2name" title="Link to this definition"></a></dt>
+<dd><p>Mapping from category ID to category name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.name2id">
+<span class="sig-name descname"><span class="pre">name2id</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.name2id" title="Link to this definition"></a></dt>
+<dd><p>Mapping from category name to category ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.id2color">
+<span class="sig-name descname"><span class="pre">id2color</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.id2color" title="Link to this definition"></a></dt>
+<dd><p>Mapping from category ID to a unique color.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.scale" title="Link to this definition"></a></dt>
+<dd><p>Scales the image and
+annotations by the given scale factor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.show" title="Link to this definition"></a></dt>
+<dd><p>Displays the image with its corresponding annotations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the image and annotations for the given index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.__len__" title="Link to this definition"></a></dt>
+<dd><p>Returns the total number of images in the dataset.</p>
+</dd></dl>
+
+<dl class="simple">
+<dt>Private Methods:</dt><dd><dl class="simple">
+<dt>_create_annotations(annotations_path): Initializes the annotations from the COCO format</dt><dd><p>JSON file and sets up internal mappings.</p>
+</dd>
+<dt>save(index, image, anns): Saves an image and its annotations to the output folder</dt><dd><p>and dictionary.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.close" title="Link to this definition"></a></dt>
+<dd><p>Saves all annotations to a JSON file specified in the labels_output_path.</p>
+<p>This function writes the output_annotations dictionary to a JSON file
+in the specified labels output path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.reshape" title="Link to this definition"></a></dt>
+<dd><p>Reshapes an image and its corresponding annotations to a specified size.</p>
+<p>This function resizes the input image and scales the bounding boxes and
+segmentation annotations according to the new dimensions. It offers the
+option to specify the method used for resizing the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The input image to be resized.</p></li>
+<li><p><strong>anns</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – A list of annotations corresponding to the image,
+each containing at least a “bbox” key and optionally “segmentation”.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em>) – The desired output shape of the image as (width, height).</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method used for resizing the
+image, default is “bicubic”. Other methods can be defined in
+RESIZE_METHODS.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the resized image (np.ndarray) and the updated
+annotations (list[dict]).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODataset.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODataset.save" title="Link to this definition"></a></dt>
+<dd><p>Saves an image and its annotations to the output folder and dictionary.</p>
+<p>This function writes the image to the images output folder and appends
+the annotations to the output_annotations dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<em>int</em>) – The index of the image in the dataset.</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The processed image to be saved.</p></li>
+<li><p><strong>anns</strong> (<em>list</em>) – The annotations to be saved.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This function does not return a value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Scales an image and its corresponding annotations by a specified factor.</p>
+<p>This function resizes the input image using the specified resizing method
+and scales the bounding boxes, segmentation masks, and area of the
+annotations accordingly. It handles both polygon and RLE segmentation formats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The input image to be resized.</p></li>
+<li><p><strong>anns</strong> (<em>list</em><em> of </em><em>dict</em>) – The annotations containing bounding boxes and
+segmentation data to be scaled.</p></li>
+<li><p><strong>scale_factor</strong> (<em>float</em>) – The factor by which to scale the image and annotations.</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method to use for resizing the image
+(default is “bicubic”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A tuple containing the resized image (np.ndarray) and the modified</dt><dd><p>annotations (list of dict).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd><p>Displays an image with annotations such as segmentation masks, bounding boxes, or polygons.</p>
+<p>This function takes an image represented as a NumPy array and a list of annotation
+dictionaries, visualizing the annotations on the image. Annotations may include
+segmentation data or bounding box data.
+The modified image is displayed in a window until a key is pressed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The image to annotate, represented as a NumPy array.</p></li>
+<li><p><strong>anns</strong> (<em>list</em>) – A list of annotation dictionaries, where each dictionary can contain
+segmentation data or bounding box data with category id.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This function does not return any value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">COCODatasetCaption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="resize_dataset.dataset.base.html#resize_dataset.dataset.base.ResizableDataset" title="resize_dataset.dataset.base.ResizableDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResizableDataset</span></code></a></p>
+<p>Dataset class for loading and processing images and captions in COCO format.</p>
+<p>This class provides functionality to initialize a dataset from a specified images path
+and annotations path, retrieve images and captions, scale images based on a given factor,
+and visualize the images with captions. It is designed for image captioning tasks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images_path</strong> (<em>str</em>) – Path to the folder containing images.</p></li>
+<li><p><strong>annotations_path</strong> (<em>str</em>) – Path to the COCO annotations JSON file.</p></li>
+<li><p><strong>cfg</strong> (<a class="reference internal" href="resize_dataset.utils.base.html#resize_dataset.utils.base.ConfigDict" title="resize_dataset.utils.base.ConfigDict"><em>ConfigDict</em></a>) – Configuration object containing scaling and resizing parameters.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.cfg">
+<span class="sig-name descname"><span class="pre">cfg</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.cfg" title="Link to this definition"></a></dt>
+<dd><p>Configuration object containing scaling and resizing parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="resize_dataset.utils.base.html#resize_dataset.utils.base.ConfigDict" title="resize_dataset.utils.base.ConfigDict">ConfigDict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.images_folder">
+<span class="sig-name descname"><span class="pre">images_folder</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.images_folder" title="Link to this definition"></a></dt>
+<dd><p>Path to the folder containing images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.annotations">
+<span class="sig-name descname"><span class="pre">annotations</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.annotations" title="Link to this definition"></a></dt>
+<dd><p>COCO object representing the annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>COCO</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.ids">
+<span class="sig-name descname"><span class="pre">ids</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.ids" title="Link to this definition"></a></dt>
+<dd><p>Sorted list of image IDs in the annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.captions">
+<span class="sig-name descname"><span class="pre">captions</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.captions" title="Link to this definition"></a></dt>
+<dd><p>Mapping from image ID to a list of captions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.scale" title="Link to this definition"></a></dt>
+<dd><p>Scales the image
+by the given scale factor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.show" title="Link to this definition"></a></dt>
+<dd><p>Displays the image with its corresponding caption.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the image and caption for the given index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.__len__" title="Link to this definition"></a></dt>
+<dd><p>Returns the total number of images in the dataset.</p>
+</dd></dl>
+
+<dl class="simple">
+<dt>Private Methods:</dt><dd><dl class="simple">
+<dt>_create_annotations(annotations_path): Initializes the annotations from the</dt><dd><p>COCO format JSON file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.close" title="Link to this definition"></a></dt>
+<dd><p>Optionally, save any results or annotations if needed.</p>
+<p>For image captioning, this might not be required, but included for consistency.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.reshape" title="Link to this definition"></a></dt>
+<dd><p>Reshapes an image and its corresponding annotations to a specified size.</p>
+<p>This function resizes the input image and scales the bounding boxes,
+segmentation and all annotations according to the new dimensions. It offers the
+option to specify the method used for resizing the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The input image to be resized.</p></li>
+<li><p><strong>anns</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – A list of annotations corresponding to the image,
+each containing at least a “bbox” key and optionally “segmentation”.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em>) – The desired output shape of the image as (width, height).</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method used for resizing the
+image, default is “bicubic”. Other methods can be defined in
+RESIZE_METHODS.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the resized image (np.ndarray) and the updated
+annotations (list[dict]).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetCaption.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetCaption.save" title="Link to this definition"></a></dt>
+<dd><p>Saves an image and its caption to the output folder.</p>
+<p>This function writes the image to the images output folder and saves the caption
+to a text file named according to the image ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<em>int</em>) – The index of the image in the dataset.</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The processed image to be saved.</p></li>
+<li><p><strong>caption</strong> (<em>str</em>) – The caption to be saved.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This function does not return any value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd><p>Scales an image by a specified factor.</p>
+<p>This function resizes the input image using the specified resizing method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The input image to be resized.</p></li>
+<li><p><strong>scale_factor</strong> (<em>float</em>) – The factor by which to scale the image.</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method to use for resizing the
+image (default is “bicubic”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resized image (np.ndarray).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd><p>Displays an image with its caption.</p>
+<p>This function takes an image represented as a NumPy array and a caption,
+visualizing the image with the caption.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The image to display.</p></li>
+<li><p><strong>caption</strong> (<em>str</em>) – The caption to display with the image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This function does not return any value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">COCODatasetDensePose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="resize_dataset.dataset.base.html#resize_dataset.dataset.base.ResizableDataset" title="resize_dataset.dataset.base.ResizableDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResizableDataset</span></code></a></p>
+<p>Dataset class for loading and processing images and DensePose annotations in COCO format.</p>
+<p>This class enables the management of a dataset containing images and their associated
+DensePose annotations formatted according to the COCO standard. It provides methods
+for filtering valid images, scaling and reshaping images and annotations, and visualizing
+the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images_path</strong> (<em>str</em>) – Path to the folder containing images.</p></li>
+<li><p><strong>annotations_path</strong> (<em>str</em>) – Path to the COCO JSON annotations file.</p></li>
+<li><p><strong>cfg</strong> (<em>Config</em>) – Configuration object containing various settings.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.cfg">
+<span class="sig-name descname"><span class="pre">cfg</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.cfg" title="Link to this definition"></a></dt>
+<dd><p>Configuration settings for the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Config</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.images_folder">
+<span class="sig-name descname"><span class="pre">images_folder</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.images_folder" title="Link to this definition"></a></dt>
+<dd><p>Path to the images folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.ids">
+<span class="sig-name descname"><span class="pre">ids</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.ids" title="Link to this definition"></a></dt>
+<dd><p>List of valid image IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.id2name">
+<span class="sig-name descname"><span class="pre">id2name</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.id2name" title="Link to this definition"></a></dt>
+<dd><p>Mapping from image IDs to image names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[int, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.name2id">
+<span class="sig-name descname"><span class="pre">name2id</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.name2id" title="Link to this definition"></a></dt>
+<dd><p>Mapping from image names to image IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.id2color">
+<span class="sig-name descname"><span class="pre">id2color</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.id2color" title="Link to this definition"></a></dt>
+<dd><p>Mapping of image IDs to color values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[int, tuple[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.images_output_folder">
+<span class="sig-name descname"><span class="pre">images_output_folder</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.images_output_folder" title="Link to this definition"></a></dt>
+<dd><p>Output folder for saving processed images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.labels_output_path">
+<span class="sig-name descname"><span class="pre">labels_output_path</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.labels_output_path" title="Link to this definition"></a></dt>
+<dd><p>Path to save output annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.output_annotations">
+<span class="sig-name descname"><span class="pre">output_annotations</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.output_annotations" title="Link to this definition"></a></dt>
+<dd><p>Structure containing output annotations data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Retrieves and processes an image and its associated
+DensePose annotations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.__len__" title="Link to this definition"></a></dt>
+<dd><p>Returns the number of images in the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.save" title="Link to this definition"></a></dt>
+<dd><p>Saves the processed image and its
+corresponding annotations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.close" title="Link to this definition"></a></dt>
+<dd><p>Saves all DensePose annotations to a JSON file specified in the
+labels_output_path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.scale" title="Link to this definition"></a></dt>
+<dd><p>Scales an
+image and its associated DensePose annotations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.reshape" title="Link to this definition"></a></dt>
+<dd><p>Reshapes an
+image and its corresponding annotations to a specified size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetDensePose.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetDensePose.show" title="Link to this definition"></a></dt>
+<dd><p>Displays an image with its associated DensePose annotations.</p>
+</dd></dl>
+
+<dl class="simple">
+<dt>Private Methods:</dt><dd><dl class="simple">
+<dt>_create_annotations(annotations_path): Creates and organizes annotations from</dt><dd><p>a specified JSON file.</p>
+</dd>
+<dt>_filter_valid_images(): Checks which images can be successfully loaded and</dt><dd><p>returns a list of valid image IDs.</p>
+</dd>
+<dt>_filter_valid_annotations(): Updates annotations to include only those related</dt><dd><p>to valid images.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<dd><p>Saves all DensePose annotations to a JSON file specified in the labels_output_path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dd><p>Reshapes an image and its corresponding annotations to a specified size.</p>
+<p>This function resizes the input image and scales the bounding boxes,
+segmentation and all annotations according to the new dimensions. It offers the
+option to specify the method used for resizing the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The input image to be resized.</p></li>
+<li><p><strong>anns</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – A list of annotations corresponding to the image,
+each containing at least a “bbox” key and optionally “segmentation”.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em>) – The desired output shape of the image as (width, height).</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method used for resizing the
+image, default is “bicubic”. Other methods can be defined in
+RESIZE_METHODS.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the resized image (np.ndarray) and the updated
+annotations (list[dict]).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<dd><p>Saves the processed image and its corresponding annotations.</p>
+<p>This method saves the processed image to the specified output folder, updates
+the image’s metadata, and appends the metadata and annotations to the output
+annotations list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<em>int</em>) – The index of the image in the dataset, used to retrieve the image ID.</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The processed image to be saved.</p></li>
+<li><p><strong>anns</strong> (<em>dict</em>) – The annotations associated with the image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<dd><p>Scales an image and its associated DensePose annotations by a specified factor.</p>
+<p>This function rescales the input image and adjusts the DensePose annotations
+(including bounding boxes, masks, keypoints, and segmentations) according to
+the given <cite>scale_factor</cite>. The annotations are modified in place to reflect
+the new scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The input image to be scaled.</p></li>
+<li><p><strong>anns</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>A list of annotations, each annotation being a dictionary
+that may contain:
+- “bbox” (list[float]): The bounding box coordinates [x, y, width, height].
+- “dp_masks” (list[dict]): DensePose masks represented as dictionaries containing:</p>
+<blockquote>
+<div><ul>
+<li><p>”size” (list[int]): The size of the mask [height, width].</p></li>
+<li><p>”counts” (str or list[int]): RLE-encoded mask or binary mask counts.</p></li>
+</ul>
+</div></blockquote>
+<ul>
+<li><p>”area” (float): The area of the annotated region.</p></li>
+<li><dl class="simple">
+<dt>”keypoints” (list[float]): Keypoint coordinates and visibility flags</dt><dd><p>[x1, y1, v1, x2, y2, v2, …].</p>
+</dd>
+</dl>
+</li>
+<li><p>”segmentation” (list[list[float]]): Segmentation polygon coordinates.</p></li>
+</ul>
+</p></li>
+<li><p><strong>scale_factor</strong> (<em>float</em>) – The factor by which to scale the image and annotations.</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The interpolation method to use when
+resizing the image. Defaults to “bicubic”. Available methods should
+be present in the <cite>RESIZE_METHODS</cite> dictionary.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>np.ndarray: The scaled image.</p></li>
+<li><dl class="simple">
+<dt>list[dict]: The scaled annotations with updated bounding boxes, masks,</dt><dd><p>keypoints, segmentations, and area.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
+<dd><p>Displays an image with its associated DensePose annotations.</p>
+<p>This function overlays the DensePose annotations onto a copy of the input image and
+visualizes it using the appropriate visualization method from the <cite>VISUALIZATION_REGISTRY</cite>.
+The displayed image includes features such as DensePose coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The input image to be displayed.</p></li>
+<li><p><strong>anns</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – A list of annotations associated with the image,
+containing DensePose data such as:
+- “dp_masks”: DensePose masks for different body parts.
+- “keypoints”: Keypoints for different body regions.
+- Other DensePose-specific annotations.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">COCODatasetKeypoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="resize_dataset.dataset.base.html#resize_dataset.dataset.base.ResizableDataset" title="resize_dataset.dataset.base.ResizableDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResizableDataset</span></code></a></p>
+<p>A dataset class for handling COCO-format keypoint annotations, supporting
+image scaling, annotation filtering, and image loading operations.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.cfg">
+<span class="sig-name descname"><span class="pre">cfg</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.cfg" title="Link to this definition"></a></dt>
+<dd><p>Configuration dictionary containing paths and settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="resize_dataset.utils.base.html#resize_dataset.utils.base.ConfigDict" title="resize_dataset.utils.base.ConfigDict">ConfigDict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.images_folder">
+<span class="sig-name descname"><span class="pre">images_folder</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.images_folder" title="Link to this definition"></a></dt>
+<dd><p>Path to the folder containing images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.ids">
+<span class="sig-name descname"><span class="pre">ids</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.ids" title="Link to this definition"></a></dt>
+<dd><p>List of valid image IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.id2name">
+<span class="sig-name descname"><span class="pre">id2name</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.id2name" title="Link to this definition"></a></dt>
+<dd><p>Mapping from category ID to category name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.name2id">
+<span class="sig-name descname"><span class="pre">name2id</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.name2id" title="Link to this definition"></a></dt>
+<dd><p>Mapping from category name to category ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.id2color">
+<span class="sig-name descname"><span class="pre">id2color</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.id2color" title="Link to this definition"></a></dt>
+<dd><p>Mapping from category ID to a unique color.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.id2cat">
+<span class="sig-name descname"><span class="pre">id2cat</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.id2cat" title="Link to this definition"></a></dt>
+<dd><p>Mapping from category ID to category details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.images_output_folder">
+<span class="sig-name descname"><span class="pre">images_output_folder</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.images_output_folder" title="Link to this definition"></a></dt>
+<dd><p>Path to the folder where processed images will be saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.labels_output_path">
+<span class="sig-name descname"><span class="pre">labels_output_path</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.labels_output_path" title="Link to this definition"></a></dt>
+<dd><p>Path to the file where output annotations will be saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.output_annotations">
+<span class="sig-name descname"><span class="pre">output_annotations</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.output_annotations" title="Link to this definition"></a></dt>
+<dd><p>Dictionary containing the output annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes the dataset with image
+paths, annotations, and configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints._create_annotations">
+<span class="sig-name descname"><span class="pre">_create_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotations_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints._create_annotations" title="Link to this definition"></a></dt>
+<dd><p>Creates and initializes keypoint annotations
+from a JSON file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints._filter_valid_images">
+<span class="sig-name descname"><span class="pre">_filter_valid_images</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints._filter_valid_images" title="Link to this definition"></a></dt>
+<dd><p>Checks which images can be successfully loaded and returns
+a list of valid image IDs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints._filter_valid_annotations">
+<span class="sig-name descname"><span class="pre">_filter_valid_annotations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints._filter_valid_annotations" title="Link to this definition"></a></dt>
+<dd><p>Updates annotations to include only those related
+to valid images.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.scale" title="Link to this definition"></a></dt>
+<dd><p>Scales the image
+and its keypoint annotations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.save" title="Link to this definition"></a></dt>
+<dd><p>Saves the processed image and annotations to the
+specified output folder.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.show" title="Link to this definition"></a></dt>
+<dd><p>Displays the image with keypoint annotations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Retrieves and processes an image and its annotations by index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.__len__" title="Link to this definition"></a></dt>
+<dd><p>Returns the number of valid images in the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.close" title="Link to this definition"></a></dt>
+<dd><p>Saves the output annotations to a file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
+<dd><p>Saves the output annotations to a file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetKeypoints.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetKeypoints.reshape" title="Link to this definition"></a></dt>
+<dd><p>Reshapes an image and its corresponding annotations to a specified size.</p>
+<p>This function resizes the input image and scales the bounding boxes,
+segmentation and all annotations according to the new dimensions. It offers the
+option to specify the method used for resizing the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The input image to be resized.</p></li>
+<li><p><strong>anns</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – A list of annotations corresponding to the image,
+each containing at least a “bbox” key and optionally “segmentation”.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em>) – The desired output shape of the image as (width, height).</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method used for resizing the
+image, default is “bicubic”. Other methods can be defined in
+RESIZE_METHODS.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the resized image (np.ndarray) and the updated
+annotations (list[dict]).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
+<dd><p>Saves the processed image and annotations to the specified output folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<em>int</em>) – Index of the image in the dataset.</p></li>
+<li><p><strong>image</strong> (<em>ndarray</em>) – Processed image to be saved.</p></li>
+<li><p><strong>anns</strong> (<em>list</em>) – List of processed annotations.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
+<dd><p>Scales the image and its keypoint annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The image to be scaled.</p></li>
+<li><p><strong>anns</strong> (<em>list</em>) – List of annotations associated with the image.</p></li>
+<li><p><strong>scale_factor</strong> (<em>float</em>) – Factor by which to scale the image and keypoints.</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em>) – Method used to resize the image. Defaults to “bicubic”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Scaled image and annotations.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id12" title="Link to this definition"></a></dt>
+<dd><p>Displays the image with keypoint annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – Image to be displayed.</p></li>
+<li><p><strong>anns</strong> (<em>list</em>) – List of annotations to be displayed on the image.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">COCODatasetPanoptic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="resize_dataset.dataset.base.html#resize_dataset.dataset.base.ResizableDataset" title="resize_dataset.dataset.base.ResizableDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResizableDataset</span></code></a></p>
+<p>Dataset class for loading and processing images and annotations in COCO format
+for Panoptic Segmentation tasks (<a class="reference external" href="https://cocodataset.org/#format-data">https://cocodataset.org/#format-data</a>).</p>
+<p>This class provides functionality to initialize a dataset from specified image and
+annotation paths, retrieve images and annotations, scale images and annotations based
+on a given factor, and visualize the annotations on images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images_path</strong> (<em>str</em>) – Path to the folder containing images.</p></li>
+<li><p><strong>annotations_path</strong> (<em>str</em>) – Path to the COCO annotations JSON file.</p></li>
+<li><p><strong>cfg</strong> (<a class="reference internal" href="resize_dataset.utils.base.html#resize_dataset.utils.base.ConfigDict" title="resize_dataset.utils.base.ConfigDict"><em>ConfigDict</em></a>) – Configuration object containing scaling and resizing parameters.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.cfg">
+<span class="sig-name descname"><span class="pre">cfg</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.cfg" title="Link to this definition"></a></dt>
+<dd><p>Configuration object containing scaling and resizing parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="resize_dataset.utils.base.html#resize_dataset.utils.base.ConfigDict" title="resize_dataset.utils.base.ConfigDict">ConfigDict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.images_folder">
+<span class="sig-name descname"><span class="pre">images_folder</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.images_folder" title="Link to this definition"></a></dt>
+<dd><p>Path to the folder containing images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.annotations">
+<span class="sig-name descname"><span class="pre">annotations</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.annotations" title="Link to this definition"></a></dt>
+<dd><p>COCO object representing the annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>COCO</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.ids">
+<span class="sig-name descname"><span class="pre">ids</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.ids" title="Link to this definition"></a></dt>
+<dd><p>Sorted list of image IDs in the annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.id2name">
+<span class="sig-name descname"><span class="pre">id2name</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.id2name" title="Link to this definition"></a></dt>
+<dd><p>Mapping from category ID to category name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.name2id">
+<span class="sig-name descname"><span class="pre">name2id</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.name2id" title="Link to this definition"></a></dt>
+<dd><p>Mapping from category name to category ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.id2color">
+<span class="sig-name descname"><span class="pre">id2color</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.id2color" title="Link to this definition"></a></dt>
+<dd><p>Mapping from category ID to a unique color.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.images_output_folder">
+<span class="sig-name descname"><span class="pre">images_output_folder</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.images_output_folder" title="Link to this definition"></a></dt>
+<dd><p>Path to save the output processed images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.labels_output_folder">
+<span class="sig-name descname"><span class="pre">labels_output_folder</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.labels_output_folder" title="Link to this definition"></a></dt>
+<dd><p>Path to save the output labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.labels_output_path">
+<span class="sig-name descname"><span class="pre">labels_output_path</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.labels_output_path" title="Link to this definition"></a></dt>
+<dd><p>Path to the output JSON file for annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.output_annotations">
+<span class="sig-name descname"><span class="pre">output_annotations</span></span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.output_annotations" title="Link to this definition"></a></dt>
+<dd><p>Dictionary to store output annotations for saving.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes the dataset with
+images and annotations, and prepares the necessary mappings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.scale" title="Link to this definition"></a></dt>
+<dd><p>Scales an
+image and its corresponding annotations by a specified factor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.save" title="Link to this definition"></a></dt>
+<dd><p>Saves an image and its annotations to the output
+folders and dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.show" title="Link to this definition"></a></dt>
+<dd><p>Displays an image with its annotations such as segmentation
+masks, bounding boxes, or polygons.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Retrieves an image and its associated annotations from
+the dataset based on the given index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.__len__" title="Link to this definition"></a></dt>
+<dd><p>Returns the number of images in the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.close" title="Link to this definition"></a></dt>
+<dd><p>Saves all annotations to a JSON file specified in the labels_output_path.</p>
+</dd></dl>
+
+<dl class="simple">
+<dt>Private Methods:</dt><dd><dl class="simple">
+<dt>_create_annotations(annotations_path): Creates and parses the annotations</dt><dd><p>from the COCO format based on the provided annotations path.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id13">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id13" title="Link to this definition"></a></dt>
+<dd><p>Saves all annotations to a JSON file specified in the labels_output_path.</p>
+<p>This function writes the output_annotations dictionary to a JSON file
+in the specified labels output path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="resize_dataset.dataset.coco.COCODatasetPanoptic.reshape">
+<span class="sig-name descname"><span class="pre">reshape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.dataset.coco.COCODatasetPanoptic.reshape" title="Link to this definition"></a></dt>
+<dd><p>Reshapes an image and its corresponding segmentation annotations to a specified size.</p>
+<p>This function resizes the input image using a specified interpolation method
+and adjusts the corresponding segmentation annotations to match the new dimensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The input image to be resized.</p></li>
+<li><p><strong>anns</strong> (<em>dict</em>) – The annotations corresponding to the image, including
+segmentation information.</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em>) – The desired shape for the output image as (width, height).</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method to use for resizing the image
+(default is “bicubic”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A tuple containing the resized image (np.ndarray) and a tuple of updated</dt><dd><p>annotations (dict) along with the resized segmentation mask (np.ndarray).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id14">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id14" title="Link to this definition"></a></dt>
+<dd><p>Saves an image and its annotations to the output folders and dictionary.</p>
+<p>This function writes the image and annotation to the specified output folders
+and appends the annotations in the output_annotations dictionary. The function
+handles both the image file and its corresponding mask for annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<em>int</em>) – The index of the image in the dataset.</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The processed image to be saved.</p></li>
+<li><p><strong>anns</strong> (<em>list</em>) – The annotations to be saved, where the first element is the
+annotation dictionary and the second element is the scaled mask.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This function does not return a value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id15">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_image_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id15" title="Link to this definition"></a></dt>
+<dd><p>Scales an image and its corresponding annotations by a specified factor.</p>
+<p>This function resizes the input image using the specified resizing method
+and scales the segmentation masks, bounding boxes, and area of the
+annotations accordingly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>np.ndarray</em>) – The input image to be resized.</p></li>
+<li><p><strong>anns</strong> (<em>dict</em>) – The annotations containing segmentation data to be scaled.</p></li>
+<li><p><strong>scale_factor</strong> (<em>float</em>) – The factor by which to scale the image and annotations.</p></li>
+<li><p><strong>resize_image_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method to use for resizing the image
+(default is “bicubic”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A tuple containing the resized image (np.ndarray) and a tuple</dt><dd><dl class="simple">
+<dt>containing the modified annotations (dict) and scaled segmentation mask</dt><dd><p>(np.ndarray).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id16" title="Link to this definition"></a></dt>
+<dd><p>Displays an image with annotations such as segmentation masks, bounding boxes, or polygons.</p>
+<p>This function takes an image and its annotations, and visualizes the annotations
+on the image. Annotations may include segmentation information or bounding box data.
+The modified image is displayed in a window until a key is pressed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>np.ndarray</em>) – The image to annotate, represented as a NumPy array.</p></li>
+<li><p><strong>anns</strong> (<em>tuple</em>) – <p>A tuple containing:
+- annotation (dict): The annotation dictionary containing segmentation and</p>
+<blockquote>
+<div><p>bounding box data.</p>
+</div></blockquote>
+<ul>
+<li><p>scaled_mask (np.ndarray): The scaled mask to assist in visualization of segments.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This function does not return any value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francisco Javier Gañan, German Ferrando.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

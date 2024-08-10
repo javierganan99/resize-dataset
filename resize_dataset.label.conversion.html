@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>label.conversion module &mdash; Resize Dataset 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Resize Dataset
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">resize-dataset</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Resize Dataset</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">label.conversion module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/resize_dataset.label.conversion.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-resize_dataset.label.conversion">
+<span id="label-conversion-module"></span><h1>label.conversion module<a class="headerlink" href="#module-resize_dataset.label.conversion" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.conversion.binary_mask_to_rle_coded">
+<span class="sig-name descname"><span class="pre">binary_mask_to_rle_coded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.conversion.binary_mask_to_rle_coded" title="Link to this definition"></a></dt>
+<dd><p>Converts a binary mask to Run-Length Encoding (RLE) format.</p>
+<p>This function takes a binary mask as input and converts it to a
+Run-Length Encoding format that is suitable for storage or transmission.
+The mask is first reshaped to ensure it has the correct dimensions,
+then it is encoded using the COCO mask encoding method. The encoded
+data is then compressed using zlib and base64 encoded for easier handling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mask</strong> (<em>numpy.ndarray</em>) – A binary mask array with shape (height, width)
+where the mask values are either 0 or 1.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A base64 encoded string representing the compressed RLE format</dt><dd><p>of the input mask.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.conversion.mask_to_rle">
+<span class="sig-name descname"><span class="pre">mask_to_rle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'F'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.conversion.mask_to_rle" title="Link to this definition"></a></dt>
+<dd><p>Converts a 2D numpy array mask to RLE (Run-Length Encoded) format.</p>
+<p>This function takes a binary mask (2D numpy array) and encodes it using
+Run-Length Encoding (RLE). The RLE format is useful for compression and
+efficient storage of sparse binary images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> (<em>np.ndarray</em>) – The 2D mask array to be encoded.</p></li>
+<li><p><strong>order</strong> (<em>str</em><em>, </em><em>optional</em>) – The order in which to read the mask.
+‘F’ for Fortran order (column-major), ‘C’ for C order (row-major).
+Default is ‘F’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The RLE encoded mask in the format [start1, length1, start2,</dt><dd><p>length2, …] where start is relative to the last position of 1.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.conversion.rle_coded_to_binary_mask">
+<span class="sig-name descname"><span class="pre">rle_coded_to_binary_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rle_coded_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">im_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">im_width</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.conversion.rle_coded_to_binary_mask" title="Link to this definition"></a></dt>
+<dd><p>Converts a run-length encoded (RLE) string to a binary mask.</p>
+<p>This function decodes the input run-length encoded string, decompresses it,
+and constructs a binary mask based on the specified image dimensions. The
+resulting mask can be used for image segmentation tasks, particularly in
+computer vision applications.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rle_coded_str</strong> (<em>str</em>) – The run-length encoded string representing the mask.</p></li>
+<li><p><strong>im_height</strong> (<em>int</em>) – The height of the image.</p></li>
+<li><p><strong>im_width</strong> (<em>int</em>) – The width of the image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A binary mask of shape (im_height, im_width), where True
+values indicate the presence of the detected object(s) and False values
+indicate the absence.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="resize_dataset.label.conversion.rle_to_mask">
+<span class="sig-name descname"><span class="pre">rle_to_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'F'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#resize_dataset.label.conversion.rle_to_mask" title="Link to this definition"></a></dt>
+<dd><p>Converts a Run-Length Encoded (RLE) mask to a 2D numpy array.</p>
+<p>This function takes an RLE representation of a binary mask, which specifies the
+locations and lengths of runs of pixels set to 1, and converts it into a 2D
+numpy array of the specified height and width.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rle</strong> (<em>list</em>) – Run-length encoded mask in the format
+[start1, length1, start2, length2, …], where ‘start’ indicates
+the number of pixels to skip from the last position of 1.</p></li>
+<li><p><strong>height</strong> (<em>int</em>) – Height of the resulting mask.</p></li>
+<li><p><strong>width</strong> (<em>int</em>) – Width of the resulting mask.</p></li>
+<li><p><strong>order</strong> (<em>str</em><em>, </em><em>optional</em>) – Multi-dimensional data layout order. Default is ‘F’
+(Fortran-style column-major order).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The decoded mask represented as a 2D numpy array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Francisco Javier Gañan, German Ferrando.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
