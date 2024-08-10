@@ -70,7 +70,7 @@ class COCODataset(ResizableDataset):
         self.cfg = cfg
         self.images_folder = images_path
         self._create_annotations(annotations_path)
-        self.ids = list(sorted(self.annotations.imgs.keys()))
+        self.ids = self._get_valid_image_ids()
         self.id2name = {k: v["name"] for k, v in self.annotations.cats.items()}
         self.name2id = {v: k for k, v in self.id2name.items()}
         self.id2color = generate_n_unique_colors(self.id2name.keys())
@@ -126,6 +126,25 @@ class COCODataset(ResizableDataset):
         if "categories" in self.annotations.dataset:
             for cat in self.annotations.dataset["categories"]:
                 self.annotations["cats"][cat["id"]] = cat
+
+    def _get_valid_image_ids(self):
+        """
+        Checks which images can be successfully loaded and returns a list of valid image IDs.
+
+        Returns:
+            list: A list of valid image IDs.
+        """
+        valid_ids = []
+        for img_id, img_data in self.annotations["imgs"].items():
+            img_path = str(Path(self.images_folder) / img_data["file_name"])
+            if not os.path.exists(img_path):
+                LOGGER.info(
+                    "Can't open filepath %s, it could not exist or be corrupted.",
+                    img_path,
+                )
+                continue
+            valid_ids.append(img_id)
+        return sorted(valid_ids)
 
     def scale(self, img, anns, scale_factor, resize_image_method="bicubic"):
         """
@@ -445,7 +464,7 @@ class COCODatasetPanoptic(ResizableDataset):
         self.images_folder = images_path
         self._create_annotations(annotations_path)
         self.annotations_folder = Path(annotations_path).with_suffix("")
-        self.ids = list(sorted(self.annotations.imgs.keys()))
+        self.ids = self._get_valid_image_ids()
         self.id2name = {k: v["name"] for k, v in self.annotations.cats.items()}
         self.name2id = {v: k for k, v in self.id2name.items()}
         self.id2color = generate_n_unique_colors(self.id2name.keys())
@@ -498,6 +517,25 @@ class COCODatasetPanoptic(ResizableDataset):
         if "categories" in self.annotations.dataset:
             for cat in self.annotations.dataset["categories"]:
                 self.annotations["cats"][cat["id"]] = cat
+
+    def _get_valid_image_ids(self):
+        """
+        Checks which images can be successfully loaded and returns a list of valid image IDs.
+
+        Returns:
+            list: A list of valid image IDs.
+        """
+        valid_ids = []
+        for img_id, img_data in self.annotations["imgs"].items():
+            img_path = str(Path(self.images_folder) / img_data["file_name"])
+            if not os.path.exists(img_path):
+                LOGGER.info(
+                    "Can't open filepath %s, it could not exist or be corrupted.",
+                    img_path,
+                )
+                continue
+            valid_ids.append(img_id)
+        return sorted(valid_ids)
 
     def scale(self, img, anns, scale_factor, resize_image_method="bicubic"):
         """
@@ -763,9 +801,7 @@ class COCODatasetDensePose(ResizableDataset):
         self.cfg = cfg
         self.images_folder = images_path
         self._create_annotations(annotations_path)
-        self.ids = self._filter_valid_images()
-        self._filter_valid_annotations()  # New method to filter annotations
-        self.ids = list(sorted(self.annotations.imgs.keys()))
+        self.ids = self._get_valid_image_ids()
         self.id2name = {k: v["name"] for k, v in self.annotations.cats.items()}
         self.name2id = {v: k for k, v in self.id2name.items()}
         self.id2color = generate_n_unique_colors(self.id2name.keys())
@@ -820,7 +856,7 @@ class COCODatasetDensePose(ResizableDataset):
             for cat in self.annotations.dataset["categories"]:
                 self.annotations["cats"][cat["id"]] = cat
 
-    def _filter_valid_images(self):
+    def _get_valid_image_ids(self):
         """
         Checks which images can be successfully loaded and returns a list of valid image IDs.
 
@@ -837,28 +873,7 @@ class COCODatasetDensePose(ResizableDataset):
                 )
                 continue
             valid_ids.append(img_id)
-        return valid_ids
-
-    def _filter_valid_annotations(self):
-        """
-        Updates annotations to include only those related to valid images.
-        """
-        valid_img_ids = set(self.ids)
-        self.annotations["imgs"] = {
-            img_id: img
-            for img_id, img in self.annotations["imgs"].items()
-            if img_id in valid_img_ids
-        }
-        self.annotations["anns"] = {
-            ann_id: ann
-            for ann_id, ann in self.annotations["anns"].items()
-            if ann["image_id"] in valid_img_ids
-        }
-        self.annotations["imgToAnns"] = {
-            img_id: anns
-            for img_id, anns in self.annotations["imgToAnns"].items()
-            if img_id in valid_img_ids
-        }
+        return sorted(valid_ids)
 
     def scale(self, img, anns, scale_factor, resize_image_method="bicubic"):
         """
@@ -1161,8 +1176,7 @@ class COCODatasetCaption(ResizableDataset):
         self.cfg = cfg
         self.images_folder = images_path
         self._create_annotations(annotations_path)
-        self.ids = self._filter_valid_images()
-        self._filter_valid_annotations()  # New method to filter annotations
+        self.ids = self._get_valid_image_ids()
         self.images_output_folder = self.cfg.images_output_path
         self.labels_output_path = self.cfg.labels_output_path
         self.output_annotations = self.annotations.dataset
@@ -1211,7 +1225,7 @@ class COCODatasetCaption(ResizableDataset):
             for img in self.annotations.dataset["images"]:
                 self.annotations["imgs"][img["id"]] = img
 
-    def _filter_valid_images(self):
+    def _get_valid_image_ids(self):
         """
         Checks which images can be successfully loaded and returns a list of valid image IDs.
 
@@ -1228,28 +1242,7 @@ class COCODatasetCaption(ResizableDataset):
                 )
                 continue
             valid_ids.append(img_id)
-        return valid_ids
-
-    def _filter_valid_annotations(self):
-        """
-        Updates annotations to include only those related to valid images.
-        """
-        valid_img_ids = set(self.ids)
-        self.annotations["imgs"] = {
-            img_id: img
-            for img_id, img in self.annotations["imgs"].items()
-            if img_id in valid_img_ids
-        }
-        self.annotations["anns"] = {
-            ann_id: ann
-            for ann_id, ann in self.annotations["anns"].items()
-            if ann["image_id"] in valid_img_ids
-        }
-        self.annotations["imgToAnns"] = {
-            img_id: anns
-            for img_id, anns in self.annotations["imgToAnns"].items()
-            if img_id in valid_img_ids
-        }
+        return sorted(valid_ids)
 
     def scale(self, img, anns, scale_factor, resize_image_method="bicubic"):
         """
@@ -1311,7 +1304,7 @@ class COCODatasetCaption(ResizableDataset):
             img_with_caption = image.copy()
             VISUALIZATION_REGISTRY.caption(img_with_caption, ann["caption"])
             cv2.imshow(self._window_name, img_with_caption)
-            cv2.waitKey(0)
+            cv2.waitKey(1)
 
     def __getitem__(self, index):
         """
@@ -1437,8 +1430,7 @@ class COCODatasetKeypoints(ResizableDataset):
         self.images_folder = images_path
         self._create_annotations(annotations_path)
         # Validate images and filter out invalid indices
-        self.ids = self._filter_valid_images()
-        self._filter_valid_annotations()  # New method to filter annotations
+        self.ids = self._get_valid_image_ids()
         self.id2name = {k: v["name"] for k, v in self.annotations.cats.items()}
         self.name2id = {v: k for k, v in self.id2name.items()}
         self.id2color = generate_n_unique_colors(self.id2name.keys())
@@ -1493,7 +1485,7 @@ class COCODatasetKeypoints(ResizableDataset):
                 self.annotations["catToImgs"][cat_id] = []
             self.annotations["catToImgs"][cat_id].append(img_id)
 
-    def _filter_valid_images(self):
+    def _get_valid_image_ids(self):
         """
         Checks which images can be successfully loaded and returns a list of valid image IDs.
 
@@ -1510,28 +1502,7 @@ class COCODatasetKeypoints(ResizableDataset):
                 )
                 continue
             valid_ids.append(img_id)
-        return valid_ids
-
-    def _filter_valid_annotations(self):
-        """
-        Updates annotations to include only those related to valid images.
-        """
-        valid_img_ids = set(self.ids)
-        self.annotations["imgs"] = {
-            img_id: img
-            for img_id, img in self.annotations["imgs"].items()
-            if img_id in valid_img_ids
-        }
-        self.annotations["anns"] = {
-            ann_id: ann
-            for ann_id, ann in self.annotations["anns"].items()
-            if ann["image_id"] in valid_img_ids
-        }
-        self.annotations["imgToAnns"] = {
-            img_id: anns
-            for img_id, anns in self.annotations["imgToAnns"].items()
-            if img_id in valid_img_ids
-        }
+        return sorted(valid_ids)
 
     def scale(self, img, anns, scale_factor, resize_image_method="bicubic"):
         """
