@@ -794,8 +794,7 @@ class COCODatasetDensePose(ResizableDataset):
             annotations_path (str): The file path to the JSON annotations file.
 
         Returns:
-            None: This function does not return a value. It modifies the
-            annotations attribute of the class instance in place.
+            None
         """
         self.annotations = ConfigDict()
         self.annotations["dataset"] = load_json(annotations_path)
@@ -1176,6 +1175,21 @@ class COCODatasetCaption(ResizableDataset):
         self._window = None
 
     def _create_annotations(self, annotations_path):
+        """
+        Creates and organizes annotations from a specified JSON file.
+
+        This function loads annotations from a given path and structures them into
+        a dictionary-like object. It organizes the annotations by mapping image IDs
+        to their corresponding annotations, as well as organizing categories and
+        images. The resulting structure is stored in the `annotations` attribute
+        of the class.
+
+        Args:
+            annotations_path (str): The file path to the JSON annotations file.
+
+        Returns:
+            None
+        """
         self.annotations = ConfigDict()
         self.annotations["dataset"] = load_json(annotations_path)
         self.annotations["anns"], self.annotations["cats"], self.annotations["imgs"] = (
