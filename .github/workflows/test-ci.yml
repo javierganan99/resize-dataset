@@ -18,13 +18,13 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip' 
+          cache: 'pip'
       - name: Install Poetry
         run: |
           python -m pip install --upgrade pip
           pip install poetry
       - name: Install dependencies
-        run: | 
+        run: |
           poetry install
       - name: Pytest tests
         run: poetry run pytest tests

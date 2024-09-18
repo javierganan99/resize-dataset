@@ -1,8 +1,9 @@
-from pathlib import Path
 import json
+import logging.config
 import platform
 import sys
-import logging.config
+from pathlib import Path
+
 import yaml
 
 # Configuration constants
@@ -25,7 +26,7 @@ def load_json(path):
     Returns:
         dict: The contents of the JSON file loaded as a dictionary.
     """
-    with open(str(path), "r", encoding="utf-8") as file:
+    with open(str(path), encoding="utf-8") as file:
         data = json.load(file)
     return data
 

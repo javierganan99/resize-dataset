@@ -4,7 +4,7 @@ This repository provides tools to resize computer vision datasets, enabling the 
 
 ## ⚠️ Disclaimer
 
-This repository is under continous development.
+This repository is under continuous development.
 
 ## 📋 Features
 
@@ -41,7 +41,7 @@ To install **resize-dataset** you can clone the repository and use pip.
 
 ## 🖥️ Usage
 
-**resize-dataset** can be accessed through both the Command-Line Interface (CLI) and Python code. The deault parameters are configured in the `resize-dataset/cfg/default.yaml` file, and overwritten by the specified arguments in the CLI or Python calls.
+**resize-dataset** can be accessed through both the Command-Line Interface (CLI) and Python code. The default parameters are configured in the `resize-dataset/cfg/default.yaml` file, and overwritten by the specified arguments in the CLI or Python calls.
 
 ### CLI
 

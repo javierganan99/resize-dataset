@@ -1,7 +1,8 @@
-from tqdm import tqdm
 from torch.utils.data import DataLoader
-from resize_dataset.utils import DEFAULT_CFG, colorstr, ConfigDict
+from tqdm import tqdm
+
 from resize_dataset.dataset import DATASET_REGISTRY
+from resize_dataset.utils import DEFAULT_CFG, ConfigDict, colorstr
 
 
 class ResizeDataset:

@@ -1,15 +1,10 @@
-import sys
-import re
 import contextlib
-from typing import List, Dict
+import re
+import sys
 from difflib import get_close_matches
-from resize_dataset.utils import (
-    LOGGER,
-    DEFAULT_CFG,
-    load_config,
-    colorstr,
-)
+from typing import Dict, List
 
+from resize_dataset.utils import DEFAULT_CFG, LOGGER, colorstr, load_config
 
 TASKS = ["scale"]
 
@@ -185,7 +180,7 @@ def entrypoint(debug=""):
                 colorstr(
                     "yellow",
                     "WARNING ⚠️ '%s' does not require leading dashes '--', \
-                    updating to '%s'.",
+                    updating to '%s'."s'.",
                     a,
                     a[2:],
                 )
@@ -241,7 +236,7 @@ def entrypoint(debug=""):
             colorstr(
                 "yellow",
                 f"WARNING ⚠️ 'task' is missing. Valid tasks are {TASKS}    . \
-                Using default 'task=project'.",
+                Using default 'task=project'.ct'.",
             )
         )
     if task:

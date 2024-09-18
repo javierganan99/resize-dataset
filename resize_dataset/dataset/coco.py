@@ -1,20 +1,20 @@
 import base64
 import zlib
 from pathlib import Path
+
 import cv2
-import torch
 import numpy as np
 import pycocotools.mask as mask_utils
+import torch
 from pycocotools import _mask as coco_mask
+
 from resize_dataset.image import RESIZE_METHODS
-from resize_dataset.label import (
-    VISUALIZATION_REGISTRY,
-    rle_to_mask,
-    mask_to_rle,
-)
+from resize_dataset.label import (VISUALIZATION_REGISTRY, mask_to_rle,
+                                  rle_to_mask)
 from resize_dataset.utils import ConfigDict, load_json, save_json
-from .utils import generate_n_unique_colors
+
 from .base import ResizableDataset
+from .utils import generate_n_unique_colors
 
 COCO_TASKS = ConfigDict()
 

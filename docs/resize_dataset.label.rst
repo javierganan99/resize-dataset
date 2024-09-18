@@ -4,7 +4,7 @@ label package
 Submodules
 ----------
 
-conversion 
+conversion
 ---------------------------------------
 
 .. automodule:: resize_dataset.label.conversion
@@ -12,7 +12,7 @@ conversion
    :undoc-members:
    :show-inheritance:
 
-visualization 
+visualization
 ------------------------------------------
 
 .. automodule:: resize_dataset.label.visualization

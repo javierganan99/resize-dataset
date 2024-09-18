@@ -1,5 +1,6 @@
-import pytest
 import numpy as np
+import pytest
+
 from resize_dataset.image import RESIZE_METHODS
 
 

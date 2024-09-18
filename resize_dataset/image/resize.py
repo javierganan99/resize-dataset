@@ -1,6 +1,8 @@
-from typing import overload, Union, Tuple
+from typing import Tuple, Union, overload
+
 import cv2
 import numpy as np
+
 from resize_dataset.utils import ConfigDict
 
 RESIZE_METHODS = ConfigDict()
